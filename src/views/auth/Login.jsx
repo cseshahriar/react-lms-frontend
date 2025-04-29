@@ -18,7 +18,7 @@ function Login() {
                   <h1 className="mb-1 fw-bold">Sign in</h1>
                   <span>
                     Don’t have an account?
-                    <Link to="/register/" className="ms-1">
+                    <Link to="/register" className="ms-1">
                       Sign up
                     </Link>
                   </span>
@@ -76,7 +76,7 @@ function Login() {
                       </div>
                     </div>
                     <div>
-                      <Link to="/forgot-password/">Forgot your password?</Link>
+                      <Link to="/forgot-password">Forgot your password?</Link>
                     </div>
                   </div>
                   <div>

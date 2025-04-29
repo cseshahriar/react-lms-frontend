@@ -18,7 +18,7 @@ function Register() {
                   <h1 className="mb-1 fw-bold">Sign up</h1>
                   <span>
                     Already have an account?
-                    <Link to="/login/" className="ms-1">
+                    <Link to="/login" className="ms-1">
                       Sign In
                     </Link>
                   </span>
