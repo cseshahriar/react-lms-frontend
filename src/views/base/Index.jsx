@@ -194,46 +194,6 @@ function Index() {
                                     </div>
                                 </div>
 
-
-                                <nav className="d-flex mt-5">
-                                  <ul className="pagination">
-                                    <li
-                                      className=""
-                                    >
-                                      <button
-                                        className="page-link me-1"
-                                      >
-                                        <i className="ci-arrow-left me-2" />
-                                        Previous
-                                      </button>
-                                    </li>
-                                  </ul>
-                                  <ul className="pagination">
-                                    <li
-                                        key={1}
-                                        className="active"
-                                      >
-                                        <button
-                                          className="page-link"
-                                        >
-                                          1
-                                        </button>
-                                      </li>
-                                  </ul>
-                                  <ul className="pagination">
-                                    <li
-                                      className={`totalPages`}
-                                    >
-                                      <button
-                                        className="page-link ms-1"
-                                      >
-                                        Next
-                                        <i className="ci-arrow-right ms-3" />
-                                      </button>
-                                    </li>
-                                  </ul>
-                                </nav>
-
                                 <div className="col">
                                     {/* Card */}
                                     <div className="card card-hover">
@@ -402,9 +362,45 @@ function Index() {
                                     </div>
                                 </div>
 
-
+                                <nav className="d-flex mt-5">
+                                    <ul className="pagination">
+                                        <li
+                                        className=""
+                                        >
+                                        <button
+                                            className="page-link me-1"
+                                        >
+                                            <i className="ci-arrow-left me-2" />
+                                            Previous
+                                        </button>
+                                        </li>
+                                    </ul>
+                                    <ul className="pagination">
+                                        <li
+                                            key={1}
+                                            className="active"
+                                        >
+                                            <button
+                                            className="page-link"
+                                            >
+                                            1
+                                            </button>
+                                        </li>
+                                    </ul>
+                                    <ul className="pagination">
+                                        <li
+                                        className={`totalPages`}
+                                        >
+                                        <button
+                                            className="page-link ms-1"
+                                        >
+                                            Next
+                                            <i className="ci-arrow-right ms-3" />
+                                        </button>
+                                        </li>
+                                    </ul>
+                                </nav>
                             </div>
-
                         </div>
                     </div>
                 </div>
