@@ -1,6 +1,6 @@
 import { useAuthStore } from "../store/auth";
 import apiInstance from "./axios";
-import jwt_decode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import Cookie from "js-cookie";
 import Swal from "sweetalert2";
 
@@ -71,14 +71,14 @@ export const setAuthUser = (access_token, refresh_token) => {
         secure: true
     });
 
-    const user = jwt_decode(access_token) ?? null;
+    const user = jwtDecode(access_token) ?? null;
     if(user) {
         useAuthStore.getState().setUser(user);
     }
     setAuthUser.getState().setLoading(false);
 };
 
-export const getRefreshedToken = async(refresh_token) => {
+export const getRefreshedToken = async() => {
     const refresh_token = Cookie.get("refresh_token");
     const response = await apiInstance.post(`token/refresh`, {
         refresh: refresh_token,
@@ -88,7 +88,7 @@ export const getRefreshedToken = async(refresh_token) => {
 
 export const isAccessTokenExpired = (access_token) => {
     try {
-        const decodedToken = jwt_decode(access_token);
+        const decodedToken = jwtDecode(access_token);
         return decodedToken.exp < Date.now() / 1000;
     } catch (error) {
         console.log(error);

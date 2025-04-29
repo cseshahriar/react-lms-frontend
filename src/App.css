@@ -1,42 +1,113 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+Custom Navbar Styles
+.header-container {
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.bg-primary-gradient {
+    background: linear-gradient(135deg, #3a7bd5 0%, #00d2ff 100%) !important;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.navbar-brand.brand-logo {
+    font-weight: 700;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.nav-item-highlight {
+    transition: all 0.3s ease;
+    border-radius: 5px;
+    padding: 8px 12px !important;
+    margin: 0 2px;
 }
 
-.card {
-  padding: 2em;
+.nav-item-highlight:hover {
+    background-color: rgba(255, 255, 255, 0.15) !important;
 }
 
-.read-the-docs {
-  color: #888;
+.dropdown-menu {
+    border: none !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.dropdown-menu-dark {
+    background-color: #2c3e50 !important;
+}
+
+.dropdown-item {
+    padding: 8px 15px !important;
+    transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #34495e !important;
+    transform: translateX(3px);
+}
+
+.search-form {
+    min-width: 250px;
+}
+
+.search-input {
+    border-radius: 20px 0 0 20px !important;
+    border-right: none;
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+.search-btn {
+    border-radius: 0 20px 20px 0 !important;
+    background-color: rgba(255, 255, 255, 0.9);
+    transition: all 0.3s ease;
+}
+
+.search-btn:hover {
+    background-color: white !important;
+}
+
+.btn-cart {
+    position: relative;
+    border-radius: 20px !important;
+    padding: 5px 15px !important;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.cart-count {
+    background-color: #e74c3c;
+    color: white;
+    border-radius: 50%;
+    padding: 1px 6px;
+    font-size: 0.8rem;
+    margin-left: 5px;
+}
+
+.auth-buttons .btn {
+    border-radius: 20px !important;
+    padding: 5px 15px !important;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.auth-buttons .btn-outline-light:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 992px) {
+    .search-form {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        width: 100%;
+    }
+    
+    .auth-buttons {
+        margin-top: 10px;
+    }
+    
+    .btn-cart {
+        margin-top: 10px;
+    }
+    
+    .nav-item-highlight {
+        margin: 2px 0;
+    }
 }

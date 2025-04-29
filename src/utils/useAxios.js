@@ -17,7 +17,7 @@ const useAxios = () => {
             return req;
         }
 
-        const response = await getRefreshedToken(refreshToken);
+        const response = await getRefreshedToken();
         setAuthUser(response.access, response.refresh);
         req.headers.Authorization = `Bearer ${response.data?.access}`;
         return req;
