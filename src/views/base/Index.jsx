@@ -7,7 +7,7 @@ function Index() {
         <>
             <BaseHeader />
 
-            <section className="py-lg-8 py-5">
+            <section className="py-lg-8 py-5 shadow-sm">
                 {/* container */}
                 <div className="container my-lg-8">
                     {/* row */}
@@ -58,7 +58,7 @@ function Index() {
                 </div>
             </section>
 
-            <section className="pb-8">
+            <section className="pb-8 shadow-sm">
                 <div className="container mb-lg-8">
                     {/* row */}
                     <div className="row mb-5">
@@ -745,7 +745,6 @@ function Index() {
             </section>
 
             <BaseFooter />
-
         </>
     )
 }

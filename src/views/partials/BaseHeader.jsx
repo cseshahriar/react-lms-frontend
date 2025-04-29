@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 function BaseHeader() {
     return (
         <div>
-            <nav className="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
+            <nav className="shadow-sm navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
                 <div className="container">
                     <Link className="navbar-brand" to="/">
                         Shosen
