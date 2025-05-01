@@ -17,18 +17,20 @@ function App() {
   return (
     <>
     <BrowserRouter>
-      <Routes>
-        {/** public routes */}
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/create-new-password" element={<CreateNewPassword />} />
+      <MainWrapper>
+        <Routes>
+          {/** public routes */}
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/create-new-password" element={<CreateNewPassword />} />
 
-        <Route path="/" element={<Index />} />
-        
-        {/* Protected Route */}
-        {/* <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} /> */}
-      </Routes>
+          <Route path="/" element={<Index />} />
+
+          {/* Protected Route */}
+          {/* <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} /> */}
+        </Routes>
+      </MainWrapper>
     </BrowserRouter>
     </>
   )

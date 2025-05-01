@@ -49,7 +49,7 @@ export const setUser = async() => {
     const access_token = Cookie.get("access_token");
     const refresh_token = Cookie.get("refresh_token");
     if(!access_token || !refresh_token) {
-        alert("Token does not exists");
+        // alert("Token does not exists");
         return;
     }
 
