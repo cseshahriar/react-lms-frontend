@@ -8,7 +8,7 @@ export const login = async (email, password) => {
     try {
         const { data, status } = await apiInstance.post(`user/token/`, { email, password });
         if (status === 200) {
-            setAuthUser(data.access, data.refresh);
+            await setAuthUser(data.access, data.refresh);
             return { data, error: null };
         }
     } catch (error) {
@@ -84,9 +84,14 @@ export const setAuthUser = (access_token, refresh_token) => {
         secure: true
     });
 
-    const user = jwtDecode(access_token) ?? null;
-    if(user) {
+    try {
+        const user = jwtDecode(access_token);
+        console.log('Decoded user:', user); // Add this for debugging
         useAuthStore.getState().setUser(user);
+        useAuthStore.getState().setUser(user);
+    } catch (error) {
+        console.error('Token decoding failed:', error);
+        useAuthStore.getState().setUser(null);
     }
     useAuthStore.getState().setLoading(false);
 };

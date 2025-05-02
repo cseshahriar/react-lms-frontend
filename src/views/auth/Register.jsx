@@ -131,18 +131,21 @@ function Register() {
                   </div>
                   <div>
                     <div className="d-grid">
-                      <button
-                        type="submit"
-                        className={`btn ${isLoading ? 'btn-secondary disabled' : 'btn-primary'}`}
-                      >
-                          {
-                            isLoading ? 'Processing...' : (
-                              <>
-                                Sign Up <i className='fas fa-user-plus'></i>
-                              </>
-                            )
-                          }
-                      </button>
+                      {
+                        isLoading === true && (
+                          <button type="submit" className="btn btn-primary" disabled>
+                            Processing <i className='fas fa-spinner fa-spin'></i>
+                          </button>
+                        )
+                      }
+
+                      {
+                        isLoading === false && (
+                          <button type="submit" className="btn btn-primary">
+                            Sign Up <i className='fas fa-user-plus'></i>
+                          </button>
+                        )
+                      }
                     </div>
                   </div>
                 </form>

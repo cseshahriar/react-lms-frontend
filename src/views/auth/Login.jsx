@@ -1,13 +1,10 @@
-import { useEffect, useState} from 'react'
+import { useState} from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import Swal from 'sweetalert2'
 
 import BaseHeader from '../partials/BaseHeader'
 import BaseFooter from '../partials/BaseFooter'
-
-import apiInstance from "../../utils/axios";
 import { login } from "../../utils/auth";
-
-import Swal from 'sweetalert2'
 
 function Login() {
   const navigate = useNavigate();
@@ -132,18 +129,22 @@ function Login() {
                   </div>
                   <div>
                     <div className="d-grid">
-                      <button
-                        type="submit"
-                        className={`btn ${isLoading ? 'btn-secondary disabled' : 'btn-primary'}`}
-                      >
-                          {
-                            isLoading ? 'Processing...' : (
-                              <>
-                               Sign in <i className='fas fa-sign-in-alt'></i>
-                              </>
-                            )
-                          }
-                      </button>
+                      {
+                        isLoading === true && (
+                          <button type="submit" className="btn btn-primary" disabled>
+                            Processing <i className='fas fa-spinner fa-spin'></i>
+                          </button>
+                        )
+                      }
+
+                      {
+                        isLoading === false && (
+                          <button type="submit" className="btn btn-primary">
+                            Sign in <i className='fas fa-sign-in-alt'></i>
+                          </button>
+                        )
+                      }
+
                     </div>
                   </div>
                 </form>

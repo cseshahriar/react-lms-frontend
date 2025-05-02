@@ -1,12 +1,18 @@
 import {useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-
+import { Link } from "react-router-dom";
 import { useAuthStore } from "../../store/auth";
-import { logout } from "../../utils/auth";
 
 function BaseHeader() {
-    const { user, isLoggedIn } = useAuthStore();
-    const navigate = useNavigate();
+    const allUserData = useAuthStore((state) => state.allUserData);
+
+    useEffect(() => {
+        console.log('header User data:', allUserData);
+        console.log('Cookies:', {
+            access: document.cookie.includes('access_token'),
+            refresh: document.cookie.includes('refresh_token')
+        });
+    }, [allUserData]);
+
 
     return (
         <div>
@@ -28,7 +34,7 @@ function BaseHeader() {
                     </button>
                     <div className="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-                            { isLoggedIn ? (
+                            { allUserData ? (
                                 <>
                                     <li className="nav-item dropdown">
                                         <a
@@ -173,11 +179,10 @@ function BaseHeader() {
                             </button>
                         </form>
                         {
-                            isLoggedIn ? (
+                            allUserData ? (
                                 <Link
-                                    to="#"
+                                    to="/logout"
                                     className="btn btn-primary ms-2"
-                                    onClick={''} // Use the new handler
                                 >
                                     Logout <i className="fas fa-sign-out-alt"></i>
                                 </Link>
