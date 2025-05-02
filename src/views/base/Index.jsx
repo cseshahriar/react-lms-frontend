@@ -48,7 +48,7 @@ function Index() {
                             {/* images */}
                             <div className="position-relative">
                                 <img
-                                    src="https://geeksui.codescandy.com/geeks/assets/images/background/acedamy-img/girl-image.png"
+                                    src="https://geeksui.codescandy.com/geeks/assets/images/landing-immigration/front-view-young-man-going-university-with-bag.png"
                                     alt="girl"
                                     className="end-0 bottom-0"
                                 />

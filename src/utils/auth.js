@@ -11,7 +11,7 @@ export const login = async(email, password) => {
         });
         if(status === 200) {
             setAuthUser(data.access, data.refresh);
-            alert("Login successful");
+            console.log("Login successful");
         }
         return {data, error: null};
     } catch (error) {
@@ -24,17 +24,18 @@ export const login = async(email, password) => {
 
 export const register = async(full_name, email, password, password2) => {
     try {
-        const {data, status } = await apiInstance.post(`user/register/`, {
+        const response = await apiInstance.post(`user/register/`, {
             full_name, email, password, password2
         });
         await login(email, password);
-        alert("Registration successful");
-        return {data, error: null};
+        return { data: response.data, error: null };
     } catch (error) {
         return {
             data: null,
-            error: error.response.data?.detail || "Something went wrong"
-        }
+            error: error.response?.data || {
+                non_field_errors: ["Something went wrong"]
+            }
+        };
     }
 };
 
@@ -42,24 +43,29 @@ export const logout = () => {
     Cookie.remove("access_token");
     Cookie.remove("refresh_token");
     useAuthStore.getState().setUser(null);
-    alert("You have been logged out");
+    console.log("You have been logged out");
 };
 
-export const setUser = async() => {
+export const setUser = async () => {
     const access_token = Cookie.get("access_token");
     const refresh_token = Cookie.get("refresh_token");
-    if(!access_token || !refresh_token) {
-        // alert("Token does not exists");
+
+    if (!access_token || !refresh_token) {
         return;
     }
 
-    if(isAccessTokenExpired(access_token)) {
-        const response = getRefreshedToken(refresh_token);
-        setAuthUser(response.access, response.refresh);
+    if (isAccessTokenExpired(access_token)) {
+        try {
+            const response = await getRefreshedToken();
+            setAuthUser(response.access, response.refresh);
+        } catch (err) {
+            logout(); // optionally log the user out if refresh fails
+        }
     } else {
         setAuthUser(access_token, refresh_token);
     }
 };
+
 
 export const setAuthUser = (access_token, refresh_token) => {
     Cookie.set("access_token", access_token, {
@@ -75,23 +81,29 @@ export const setAuthUser = (access_token, refresh_token) => {
     if(user) {
         useAuthStore.getState().setUser(user);
     }
-    setAuthUser.getState().setLoading(false);
+    useAuthStore.getState().setLoading(false);
 };
 
-export const getRefreshedToken = async() => {
+export const getRefreshedToken = async () => {
     const refresh_token = Cookie.get("refresh_token");
-    const response = await apiInstance.post(`token/refresh`, {
+
+    if (!refresh_token) {
+        throw new Error("No refresh token found");
+    }
+
+    const response = await apiInstance.post(`user/token/refresh/`, {
         refresh: refresh_token,
-    })
+    });
+
     return response.data;
 };
+
 
 export const isAccessTokenExpired = (access_token) => {
     try {
         const decodedToken = jwtDecode(access_token);
         return decodedToken.exp < Date.now() / 1000;
     } catch (error) {
-        console.log(error);
         return true;
     }
 };
