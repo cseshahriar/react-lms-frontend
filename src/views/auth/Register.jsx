@@ -10,6 +10,7 @@ import Swal from 'sweetalert2'
 
 function Register() {
   const navigate = useNavigate();
+
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

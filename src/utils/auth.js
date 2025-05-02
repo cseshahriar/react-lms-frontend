@@ -4,21 +4,28 @@ import { jwtDecode } from "jwt-decode";
 import Cookie from "js-cookie";
 import Swal from "sweetalert2";
 
-export const login = async(email, password) => {
+export const login = async (email, password) => {
     try {
-        const {data, status } = await apiInstance.post(`user/token/`, {
-            email, password
-        });
-        if(status === 200) {
+        const { data, status } = await apiInstance.post(`user/token/`, { email, password });
+        if (status === 200) {
             setAuthUser(data.access, data.refresh);
-            console.log("Login successful");
+            return { data, error: null };
         }
-        return {data, error: null};
     } catch (error) {
+        const backendError = error.response?.data || {};
         return {
             data: null,
-            error: error.response.data?.detail || "Something went wrong"
-        }
+            error: {
+                // Email-specific errors (e.g., "Invalid email format")
+                email: backendError.email || null,
+                // Password-specific errors (e.g., "Password too short")
+                password: backendError.password || null,
+                // General errors (e.g., "No active account found")
+                detail: backendError.detail ? [backendError.detail] : null,
+                // Non-field errors (e.g., "Account disabled")
+                nonFieldErrors: backendError.non_field_errors || null,
+            },
+        };
     }
 };
 

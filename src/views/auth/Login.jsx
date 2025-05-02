@@ -1,10 +1,43 @@
-import React from 'react'
+import { useEffect, useState} from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+
 import BaseHeader from '../partials/BaseHeader'
 import BaseFooter from '../partials/BaseFooter'
-import { Link } from 'react-router-dom'
 
+import apiInstance from "../../utils/axios";
+import { login } from "../../utils/auth";
+
+import Swal from 'sweetalert2'
 
 function Login() {
+  const navigate = useNavigate();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setErrors({});  // Clear previous errors
+
+    const { error } = await login(email, password);
+    if (error) {
+        setErrors(error);  // Set new errors
+    } else {
+      setIsLoading(false);
+      Swal.fire({
+        title: "Registration Successful",
+        icon: "success",
+        draggable: true
+      });
+      navigate("/");  // Redirect on success
+    }
+    setIsLoading(false);
+  };
+
+
   return (
     <>
       <BaseHeader />
@@ -24,7 +57,7 @@ function Login() {
                   </span>
                 </div>
                 {/* Form */}
-                <form className="needs-validation" noValidate="">
+                <form className="needs-validation" noValidate=""  onSubmit={handleSubmit}>
                   {/* Username */}
                   <div className="mb-3">
                     <label htmlFor="email" className="form-label">
@@ -33,14 +66,17 @@ function Login() {
                     <input
                       type="email"
                       id="email"
-                      className="form-control"
+                      className={`form-control ${errors?.email ? 'is-invalid' : ''}`}
                       name="email"
                       placeholder="johndoe@gmail.com"
                       required=""
+                      onChange={(e) => setEmail(e.target.value)}
                     />
-                    <div className="invalid-feedback">
-                      Please enter valid username.
-                    </div>
+                       {errors?.email && (
+                          <div className="invalid-feedback">
+                              {errors.email[0]}  // e.g., "Enter a valid email address."
+                          </div>
+                      )}
                   </div>
                   {/* Password */}
                   <div className="mb-3">
@@ -50,14 +86,29 @@ function Login() {
                     <input
                       type="password"
                       id="password"
-                      className="form-control"
+                      className={`form-control ${errors?.password ? 'is-invalid' : ''}`}
                       name="password"
                       placeholder="**************"
                       required=""
+                      onChange={(e) => setPassword(e.target.value)}
                     />
-                    <div className="invalid-feedback">
-                      Please enter valid password.
-                    </div>
+                      {errors?.password && (
+                          <div className="invalid-feedback">
+                              {errors.password[0]}  // e.g., "Password must be 8+ characters."
+                          </div>
+                      )}
+
+                      {errors?.nonFieldErrors && (
+                          <div className="alert alert-danger mt-3">
+                              {errors.nonFieldErrors[0]}  // e.g., "Account is disabled."
+                          </div>
+                      )}
+
+                      {errors?.detail && (
+                          <div className="alert alert-danger mt-3">
+                              {errors.detail[0]}  // e.g., "No active account found."
+                          </div>
+                      )}
                   </div>
                   {/* Checkbox */}
                   <div className="d-lg-flex justify-content-between align-items-center mb-4">
@@ -81,8 +132,17 @@ function Login() {
                   </div>
                   <div>
                     <div className="d-grid">
-                      <button type="submit" className="btn btn-primary">
-                        Sign in <i className='fas fa-sign-in-alt'></i>
+                      <button
+                        type="submit"
+                        className={`btn ${isLoading ? 'btn-secondary disabled' : 'btn-primary'}`}
+                      >
+                          {
+                            isLoading ? 'Processing...' : (
+                              <>
+                               Sign in <i className='fas fa-sign-in-alt'></i>
+                              </>
+                            )
+                          }
                       </button>
                     </div>
                   </div>
