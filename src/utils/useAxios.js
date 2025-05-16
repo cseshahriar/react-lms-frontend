@@ -12,8 +12,8 @@ const useAxios = () => {
         headers: {Authorization: `Bearer ${accessToken}`}
     });
 
-    axiosInstance.interceptors.request.use(async, (req) => {
-        if(!isAccessTokenExpired) {
+    axiosInstance.interceptors.request.use(async (req) => {
+        if(!isAccessTokenExpired(accessToken)) {
             return req;
         }
 

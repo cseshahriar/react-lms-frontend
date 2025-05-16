@@ -60,6 +60,12 @@ function CreateNewPassword() {
       })
     } catch (error) {
       console.log(error);
+      setIsLoading(false);
+       Swal.fire({
+          title: error,
+          icon: "error",
+          draggable: true
+        });
     }
   }
 
