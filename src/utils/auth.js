@@ -86,7 +86,6 @@ export const setAuthUser = (access_token, refresh_token) => {
 
     try {
         const user = jwtDecode(access_token);
-        console.log('Decoded user:', user); // Add this for debugging
         useAuthStore.getState().setUser(user);
         useAuthStore.getState().setUser(user);
     } catch (error) {

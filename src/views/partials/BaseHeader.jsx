@@ -6,11 +6,7 @@ function BaseHeader() {
     const allUserData = useAuthStore((state) => state.allUserData);
 
     useEffect(() => {
-        console.log('header User data:', allUserData);
-        console.log('Cookies:', {
-            access: document.cookie.includes('access_token'),
-            refresh: document.cookie.includes('refresh_token')
-        });
+        console.log('allUserData: ', allUserData);
     }, [allUserData]);
 
 
