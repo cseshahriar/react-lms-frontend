@@ -118,3 +118,20 @@ export const isAccessTokenExpired = (access_token) => {
         return true;
     }
 };
+
+
+export const getUser = () => {
+    const access_token = Cookie.get("access_token");
+
+    if (!access_token) {
+        return null;
+    }
+
+    try {
+        const user = jwtDecode(access_token);
+        return user;
+    } catch (error) {
+        console.error('Failed to decode access token:', error);
+        return null;
+    }
+};

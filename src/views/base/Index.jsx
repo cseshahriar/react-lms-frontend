@@ -1,14 +1,19 @@
 import {useState, useEffect } from 'react'
-import moment from 'moment'
 import { Link } from 'react-router-dom'
-
-import useAxios from '../../utils/useAxios'
+import moment from 'moment'
+import Swal from 'sweetalert2'
 
 import BaseHeader from '../partials/BaseHeader'
 import BaseFooter from '../partials/BaseFooter'
 import Pagination from '../partials/Pagination'
 
+import useAxios from '../../utils/useAxios'
+import { useAuthStore } from "../../store/auth";
+
 function Index() {
+    const allUserData = useAuthStore((state) => state.allUserData);
+
+    const [user, setUser] = useState(null);
     const [courses, setCourses] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -31,11 +36,54 @@ function Index() {
 
     useEffect(() => {
         fetchCourses();
-    }, [])
+        if(allUserData) {
+            setUser(allUserData);
+            console.log('user', allUserData);
+        }
+    }, [allUserData])
 
     const handlePageChange = (page) => {
         fetchCourses(page);
     };
+
+
+    const addToCart = async (courseId, price, userId, country_name, cartId) => {
+        console.log('add to cart called with:', { courseId, userId, price, country_name, cartId });
+        if(!user) {
+            Swal.fire({
+                    title: "Login first!",
+                    icon: "error",
+                    draggable: true
+            });
+            return;
+        }
+        const formData = new FormData();
+        formData.append("course_id", courseId);
+        formData.append("user_id", userId);
+        formData.append("price", price);
+        formData.append("country_name", country_name);
+        formData.append("cart_id", cartId);
+
+        // To verify FormData contents, you need to iterate through it
+        console.log("FormData contents:");
+        for (let [key, value] of formData.entries()) {
+            console.log(key, value);
+        }
+
+        try {
+            const response = await useAxios().post(`course/cart/`, formData);
+            console.log(response.data);
+            Swal.fire({
+                    title: response.data.message,
+                    icon: "success",
+                    draggable: true
+            });
+            return response.data; // Consider returning the response data
+        } catch (error) {
+            console.error("Error adding to cart:", error);
+            throw error; // Re-throw the error so calling code can handle it
+        }
+    }
 
     return (
         <>
@@ -116,7 +164,7 @@ function Index() {
                                 {/* text */}
                                 <div className="lh-1">
                                     <h2 className="mb-1">1.8 Billion+</h2>
-                                    <span>Course enrolments</span>
+                                    <span>Course enrolment</span>
                                 </div>
                             </div>
                         </div>
@@ -159,7 +207,7 @@ function Index() {
                                 <h2 className="mb-1 h1">🔥Most Popular Courses</h2>
                                 <p>
                                     These are the most popular courses among Geeks Courses learners
-                                    worldwide in year 2022
+                                    worldwide in year 2025
                                 </p>
                             </div>
                         </div>
@@ -233,9 +281,21 @@ function Index() {
                                                         <h5 className="mb-0">৳{course.price}</h5>
                                                     </div>
                                                     <div className="col-auto">
-                                                        <button type='button' className="text-inherit text-decoration-none btn btn-primary me-2">
+                                                        <button
+                                                            type='button' className="text-inherit text-decoration-none btn btn-primary me-2"
+                                                            onClick={
+                                                                () => addToCart(
+                                                                    course.id,
+                                                                    course.price,
+                                                                    user?.user_id || null,
+                                                                    user?.country || null,
+                                                                    "34343"
+                                                                )
+                                                            }
+                                                        >
                                                             <i className="fas fa-shopping-cart text-primary text-white" />
                                                         </button>
+
                                                         <Link to={""} className="text-inherit text-decoration-none btn btn-primary">
                                                             Enroll Now <i className="fas fa-arrow-right text-primary align-middle me-2 text-white" />
                                                         </Link>

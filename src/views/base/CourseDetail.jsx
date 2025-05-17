@@ -1,24 +1,26 @@
 import { useState, useEffect } from 'react'
 import moment from 'moment'
+import Swal from 'sweetalert2'
 
 import BaseHeader from '../partials/BaseHeader'
 import BaseFooter from '../partials/BaseFooter'
 import useAxios from '../../utils/useAxios'
 
 import { Link, useParams } from 'react-router-dom'
-
-// http://localhost:5173/course-detail/frontend-excellence-with-tailwind-css-react-nextjs
+import { useAuthStore } from "../../store/auth";
+import CartId from '../plugin/CartId';
 
 function CourseDetail() {
     const params = useParams();
     const slug = params.slug;
-
+    const [addToCartBtn, setAddToCartBtn] = useState("Add To Cart");
     const [course, setCourse] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [user, setUser] = useState(null);
+    const allUserData = useAuthStore((state) => state.allUserData);
 
     const fetchCourse = () => {
         useAxios().get(`course/course-detail/${slug}/`).then(res => {
-            console.log('corse data fetch: ', res.data);
             setCourse(res.data);
             setIsLoading(false);
         })
@@ -26,7 +28,53 @@ function CourseDetail() {
 
     useEffect(() => {
         fetchCourse();
-    }, [])
+        if(allUserData) {
+            setUser(allUserData);
+            console.log('user', allUserData);
+        }
+    }, [allUserData])
+
+
+    const addToCart = async (courseId, price, userId, country_name, cartId) => {
+        console.log('add to cart called with:', { courseId, userId, price, country_name, cartId });
+        setAddToCartBtn("Adding To Cart");
+        if(!user) {
+            Swal.fire({
+                    title: "Login first!",
+                    icon: "error",
+                    draggable: true
+            });
+            return;
+        }
+        const formData = new FormData();
+        formData.append("course_id", courseId);
+        formData.append("user_id", userId);
+        formData.append("price", price);
+        formData.append("country_name", country_name);
+        formData.append("cart_id", cartId);
+
+        // To verify FormData contents, you need to iterate through it
+        console.log("FormData contents:");
+        for (let [key, value] of formData.entries()) {
+            console.log(key, value);
+        }
+
+        try {
+            const response = await useAxios().post(`course/cart/`, formData);
+            console.log(response.data);
+            Swal.fire({
+                    title: response.data.message,
+                    icon: "success",
+                    draggable: true
+            });
+            setAddToCartBtn("Added To Cart");
+            return response.data; // Consider returning the response data
+        } catch (error) {
+            console.error("Error adding to cart:", error);
+            setAddToCartBtn("Add To Cart");
+            throw error; // Re-throw the error so calling code can handle it
+        }
+    }
 
     return (
         <>
@@ -411,6 +459,7 @@ function CourseDetail() {
                                                     {/* Leave Review END */}
                                                 </div>
                                                 {/* Content END */}
+
                                                 {/* Content START */}
                                                 <div
                                                     className="tab-pane fade"
@@ -462,193 +511,7 @@ function CourseDetail() {
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        {/* Item */}
-                                                        <div className="accordion-item">
-                                                            <h2 className="accordion-header" id="headingTwo">
-                                                                <button
-                                                                    className="accordion-button collapsed"
-                                                                    type="button"
-                                                                    data-bs-toggle="collapse"
-                                                                    data-bs-target="#collapseTwo"
-                                                                    aria-expanded="false"
-                                                                    aria-controls="collapseTwo"
-                                                                >
-                                                                    <span className="text-secondary fw-bold me-3">
-                                                                        02
-                                                                    </span>
-                                                                    <span className="h6 mb-0">What is SEO?</span>
-                                                                </button>
-                                                            </h2>
-                                                            <div
-                                                                id="collapseTwo"
-                                                                className="accordion-collapse collapse"
-                                                                aria-labelledby="headingTwo"
-                                                                data-bs-parent="#accordionExample"
-                                                            >
-                                                                <div className="accordion-body pt-0">
-                                                                    Pleasure and so read the was hope entire first decided
-                                                                    the so must have as on was want up of I will rival in
-                                                                    came this touched got a physics to travelling so all
-                                                                    especially refinement monstrous desk they was arrange
-                                                                    the overall helplessly out of particularly ill are
-                                                                    purer.
-                                                                    <p className="mt-2">
-                                                                        Person she control of to beginnings view looked eyes
-                                                                        Than continues its and because and given and shown
-                                                                        creating curiously to more in are man were smaller
-                                                                        by we instead the these sighed Avoid in the
-                                                                        sufficient me real man longer of his how her for
-                                                                        countries to brains warned notch important Finds be
-                                                                        to the of on the increased explain noise of power
-                                                                        deep asking contribution this live of suppliers
-                                                                        goals bit separated poured sort several the was
-                                                                        organization the if relations go work after mechanic
-                                                                        But we've area wasn't everything needs of and doctor
-                                                                        where would.
-                                                                    </p>
-                                                                    Go he prisoners And mountains in just switching city
-                                                                    steps Might rung line what Mr Bulk; Was or between
-                                                                    towards the have phase were its world my samples are
-                                                                    the was royal he luxury the about trying And on he to
-                                                                    my enough is was the remember a although lead in were
-                                                                    through serving their assistant fame day have for its
-                                                                    after would cheek dull have what in go feedback
-                                                                    assignment Her of a any help if the a of semantics is
-                                                                    rational overhauls following in from our hazardous and
-                                                                    used more he themselves the parents up just
-                                                                    regulatory.
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        {/* Item */}
-                                                        <div className="accordion-item">
-                                                            <h2 className="accordion-header" id="headingThree">
-                                                                <button
-                                                                    className="accordion-button collapsed"
-                                                                    type="button"
-                                                                    data-bs-toggle="collapse"
-                                                                    data-bs-target="#collapseThree"
-                                                                    aria-expanded="false"
-                                                                    aria-controls="collapseThree"
-                                                                >
-                                                                    <span className="text-secondary fw-bold me-3">
-                                                                        03
-                                                                    </span>
-                                                                    <span className="h6 mb-0">
-                                                                        Who should join this course?
-                                                                    </span>
-                                                                </button>
-                                                            </h2>
-                                                            <div
-                                                                id="collapseThree"
-                                                                className="accordion-collapse collapse"
-                                                                aria-labelledby="headingThree"
-                                                                data-bs-parent="#accordionExample"
-                                                            >
-                                                                <div className="accordion-body pt-0">
-                                                                    Post no so what deal evil rent by real in. But her
-                                                                    ready least set lived spite solid. September how men
-                                                                    saw tolerably two behavior arranging. She offices for
-                                                                    highest and replied one venture pasture. Applauded no
-                                                                    discovery in newspaper allowance am northward.
-                                                                    Frequently partiality possession resolution at or
-                                                                    appearance unaffected me. Engaged its was the evident
-                                                                    pleased husband. Ye goodness felicity do disposal
-                                                                    dwelling no. First am plate jokes to began to cause a
-                                                                    scale.
-                                                                    <strong>
-                                                                        Subjects he prospect elegance followed no overcame
-                                                                    </strong>
-                                                                    possible it on.
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        {/* Item */}
-                                                        <div className="accordion-item">
-                                                            <h2 className="accordion-header" id="headingFour">
-                                                                <button
-                                                                    className="accordion-button collapsed"
-                                                                    type="button"
-                                                                    data-bs-toggle="collapse"
-                                                                    data-bs-target="#collapseFour"
-                                                                    aria-expanded="false"
-                                                                    aria-controls="collapseFour"
-                                                                >
-                                                                    <span className="text-secondary fw-bold me-3">
-                                                                        04
-                                                                    </span>
-                                                                    <span className="h6 mb-0">
-                                                                        What are the T&amp;C for this program?
-                                                                    </span>
-                                                                </button>
-                                                            </h2>
-                                                            <div
-                                                                id="collapseFour"
-                                                                className="accordion-collapse collapse"
-                                                                aria-labelledby="headingFour"
-                                                                data-bs-parent="#accordionExample"
-                                                            >
-                                                                <div className="accordion-body pt-0">
-                                                                    Night signs creeping yielding green Seasons together
-                                                                    man green fruitful make fish behold earth unto you'll
-                                                                    lights living moving sea open for fish day multiply
-                                                                    tree good female god had fruitful of creature fill
-                                                                    shall don't day fourth lesser he the isn't let
-                                                                    multiply may Creeping earth under was You're without
-                                                                    which image stars in Own creeping night of wherein
-                                                                    Heaven years their he over doesn't whose won't kind
-                                                                    seasons light Won't that fish him whose won't also it
-                                                                    dominion heaven fruitful Whales created And likeness
-                                                                    doesn't that Years without divided saying morning
-                                                                    creeping hath you'll seas cattle in multiply under
-                                                                    together in us said above dry tree herb saw living
-                                                                    darkness without have won't for i behold meat brought
-                                                                    winged Moving living second beast Over fish place
-                                                                    beast image very him evening Thing they're fruit
-                                                                    together forth day Seed lights Land creature together
-                                                                    Multiply waters form brought.
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        {/* Item */}
-                                                        <div className="accordion-item">
-                                                            <h2 className="accordion-header" id="headingFive">
-                                                                <button
-                                                                    className="accordion-button collapsed"
-                                                                    type="button"
-                                                                    data-bs-toggle="collapse"
-                                                                    data-bs-target="#collapseFive"
-                                                                    aria-expanded="false"
-                                                                    aria-controls="collapseFive"
-                                                                >
-                                                                    <span className="text-secondary fw-bold me-3">
-                                                                        05
-                                                                    </span>
-                                                                    <span className="h6 mb-0">
-                                                                        What certificates will I be received for this
-                                                                        program?
-                                                                    </span>
-                                                                </button>
-                                                            </h2>
-                                                            <div
-                                                                id="collapseFive"
-                                                                className="accordion-collapse collapse"
-                                                                aria-labelledby="headingFive"
-                                                                data-bs-parent="#accordionExample"
-                                                            >
-                                                                <div className="accordion-body pt-0">
-                                                                    Smile spoke total few great had never their too
-                                                                    Amongst moments do in arrived at my replied Fat
-                                                                    weddings servants but man believed prospect Companions
-                                                                    understood is as especially pianoforte connection
-                                                                    introduced Nay newspaper can sportsman are admitting
-                                                                    gentleman belonging his Is oppose no he summer lovers
-                                                                    twenty in Not his difficulty boisterous surrounded bed
-                                                                    Seems folly if in given scale Sex contented dependent
-                                                                    conveying advantage.
-                                                                </div>
-                                                            </div>
-                                                        </div>
+
                                                     </div>
                                                     {/* Accordion END */}
                                                 </div>
@@ -852,6 +715,7 @@ function CourseDetail() {
                                     </div>
                                 </div>
                                 {/* Main content END */}
+
                                 {/* Right sidebar START */}
                                 <div className="col-lg-4 pt-5 pt-lg-0">
                                     <div className="row mb-5 mb-lg-0">
@@ -953,15 +817,33 @@ function CourseDetail() {
                                                             </ul>
                                                         </div>
                                                     </div>
-                                                    {/* Buttons */}
+
+                                                    {/* add to cart */}
                                                     <div className="mt-3 d-sm-flex justify-content-sm-between ">
-                                                        <Link to="/cart/" className="btn btn-primary mb-0 w-100 me-2">
-                                                            <i className='fas fa-shopping-cart'></i> Add To Cart
-                                                        </Link>
+                                                        <button
+                                                            type='button'
+                                                            className="btn btn-primary mb-0 w-100 me-2"
+                                                            onClick={
+                                                                () => addToCart(
+                                                                    course.id,
+                                                                    course.price,
+                                                                    user?.user_id || null,
+                                                                    user?.country || null,
+                                                                    CartId()
+                                                                )
+                                                            }
+                                                        >
+                                                            {
+                                                                addToCartBtn == "Add To Cart" ?
+                                                                <i className='fas fa-shopping-cart'></i>  : addToCartBtn == "Added To Cart" ?  <i className='fas fa-check-circle'></i> :  <i className='fas fa-spinner fa-spine'></i>
+                                                            }
+                                                            { addToCartBtn }
+                                                        </button>
                                                         <Link to="/cart/" className="btn btn-success mb-0 w-100">
                                                             Enroll Now <i className='fas fa-arrow-right'></i>
                                                         </Link>
                                                     </div>
+
                                                 </div>
                                             </div>
                                             {/* Video END */}
