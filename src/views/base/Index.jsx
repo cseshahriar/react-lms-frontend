@@ -1,5 +1,5 @@
 import {useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import moment from 'moment'
 import Swal from 'sweetalert2'
 
@@ -12,6 +12,7 @@ import { useAuthStore } from "../../store/auth";
 import CartId from '../plugin/CartId';
 
 function Index() {
+    const navigate = useNavigate();
     const allUserData = useAuthStore((state) => state.allUserData);
 
     const [user, setUser] = useState(null);
@@ -84,6 +85,11 @@ function Index() {
             console.error("Error adding to cart:", error);
             throw error; // Re-throw the error so calling code can handle it
         }
+    }
+
+    const enrolment = (courseId, price, userId, country_name, cartId) => {
+        addToCart(courseId, price, userId, country_name, cartId);
+        navigate('/cart');
     }
 
     return (
@@ -297,9 +303,19 @@ function Index() {
                                                             <i className="fas fa-shopping-cart text-primary text-white" />
                                                         </button>
 
-                                                        <Link to={""} className="text-inherit text-decoration-none btn btn-primary">
+                                                        <button
+                                                            onClick={
+                                                                () => enrolment(
+                                                                    course.id,
+                                                                    course.price,
+                                                                    user?.user_id || null,
+                                                                    user?.country || null,
+                                                                    CartId()
+                                                                )
+                                                            }
+                                                            type='button'  className="text-inherit text-decoration-none btn btn-primary">
                                                             Enroll Now <i className="fas fa-arrow-right text-primary align-middle me-2 text-white" />
-                                                        </Link>
+                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>

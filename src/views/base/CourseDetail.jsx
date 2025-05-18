@@ -5,7 +5,7 @@ import BaseHeader from '../partials/BaseHeader'
 import BaseFooter from '../partials/BaseFooter'
 import useAxios from '../../utils/useAxios'
 
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useAuthStore } from "../../store/auth";
 import CartId from '../plugin/CartId';
 import UserData from '../plugin/UserData'
@@ -13,6 +13,7 @@ import Toast from '../plugin/Toast'
 
 
 function CourseDetail() {
+    const navigate = useNavigate();
     const params = useParams();
     const slug = params.slug;
     const [addToCartBtn, setAddToCartBtn] = useState("Add To Cart");
@@ -27,7 +28,6 @@ function CourseDetail() {
             setIsLoading(false);
         })
     }
-    console.log('data', data);
 
     useEffect(() => {
         fetchCourse();
@@ -78,6 +78,11 @@ function CourseDetail() {
             setAddToCartBtn("Add To Cart");
             throw error; // Re-throw the error so calling code can handle it
         }
+    }
+
+    const enrolment = (courseId, price, userId, country_name, cartId) => {
+        addToCart(courseId, price, userId, country_name, cartId);
+        navigate('/cart');
     }
 
     return (
@@ -843,9 +848,20 @@ function CourseDetail() {
                                                             }
                                                             { addToCartBtn }
                                                         </button>
-                                                        <Link to="/cart/" className="btn btn-success mb-0 w-100">
+                                                        <button
+                                                            onClick={
+                                                                () => enrolment(
+                                                                    course.id,
+                                                                    course.price,
+                                                                    user?.user_id || null,
+                                                                    user?.country || null,
+                                                                    CartId()
+                                                                )
+                                                            }
+                                                            type='button' className="btn btn-success mb-0 w-100">
                                                             Enroll Now <i className='fas fa-arrow-right'></i>
-                                                        </Link>
+                                                        </button>
+
                                                     </div>
 
                                                 </div>

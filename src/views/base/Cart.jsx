@@ -1,10 +1,70 @@
-import React from 'react'
+import React, {useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
 import BaseHeader from '../partials/BaseHeader'
 import BaseFooter from '../partials/BaseFooter'
 
+import CartId from '../plugin/CartId';
+import apiInstance from '../../utils/axios';
+import Toast from '../plugin/Toast';
+import UserData from '../plugin/UserData'
+
 function Cart() {
+    const [carts, setCarts] = useState([]);
+    const [cartStats, setCartStats] = useState([]);
+    const cartID = CartId();
+    const [user, setUser] = useState(null);
+
+    const fetchCartItems = async() => {
+        try {
+            await apiInstance.get(`course/cart-list/${cartID}`)
+                .then((response) => {
+                    console.log('carts: ', response.data);
+                    setCarts(response.data);
+                });
+
+            await apiInstance.get(`cart/stats/${cartID}`)
+                .then((response) => {
+                    console.log('stats: ', response.data);
+                    setCartStats(response.data);
+                })
+        } catch (error) {
+            Toast().fire({
+                    title: error.data.message,
+                    icon: "error",
+                    draggable: true
+            });
+        }
+    }
+
+    useEffect(() => {
+        fetchCartItems();
+        if(!user) {
+           const current_user = UserData();
+           if(current_user) {
+            setUser(current_user);
+           }
+        }
+    }, [])
+
+    const cartItemDelete = async(itemId) => {
+        try {
+            await apiInstance.delete(`course/cart-item-delete/${cartID}/${itemId}/`)
+            .then((response) => {
+                fetchCartItems();
+                Toast().fire({
+                    title: "Cart item removed successfully",
+                    icon: "success",
+                });
+            });
+        } catch (error) {
+            Toast().fire({
+                title: error.data.message,
+                icon: "error",
+            });
+        }
+    }
+
     return (
         <>
             <BaseHeader />
@@ -14,7 +74,7 @@ function Cart() {
                     <div className="row">
                         <div className="col-12">
                             <div className="bg-light p-4 text-center rounded-3">
-                                <h1 className="m-0">My cart</h1>
+                                <h1 className="m-0">My Cart</h1>
                                 {/* Breadcrumb */}
                                 <div className="d-flex justify-content-center">
                                     <nav aria-label="breadcrumb">
@@ -44,73 +104,37 @@ function Cart() {
                             {/* Main content START */}
                             <div className="col-lg-8 mb-4 mb-sm-0">
                                 <div className="p-4 shadow rounded-3">
-                                    <h5 className="mb-0 mb-3">Cart Items (3)</h5>
+                                    <h5 className="mb-0 mb-3">Cart Items ({carts?.length||0})</h5>
 
                                     <div className="table-responsive border-0 rounded-3">
                                         <table className="table align-middle p-4 mb-0">
                                             <tbody className="border-top-2">
-                                                <tr>
-                                                    <td>
-                                                        <div className="d-lg-flex align-items-center">
-                                                            <div className="w-100px w-md-80px mb-2 mb-md-0">
-                                                                <img src="https://eduport.webestica.com/assets/images/courses/4by3/07.jpg" style={{ width: "100px", height: "70px", objectFit: "cover" }} className="rounded" alt="" />
-                                                            </div>
-                                                            <h6 className="mb-0 ms-lg-3 mt-2 mt-lg-0">
-                                                                <a href="#" className='text-decoration-none text-dark' >Building Scalable APIs with GraphQL</a>
-                                                            </h6>
-                                                        </div>
-                                                    </td>
-                                                    <td className="text-center">
-                                                        <h5 className="text-success mb-0">$350</h5>
-                                                    </td>
-                                                    <td>
-                                                        <button className="btn btn-sm btn-danger px-2 mb-0">
-                                                            <i className="fas fa-fw fa-times" />
-                                                        </button>
-                                                    </td>
-                                                </tr>
+                                                {
+                                                    carts?.map((cart, index) => (
+                                                        <tr key={index}>
+                                                            <td>
+                                                                <div className="d-lg-flex align-items-center">
+                                                                    <div className="w-100px w-md-80px mb-2 mb-md-0">
+                                                                        <img src={cart.course?.image} style={{ width: "100px", height: "70px", objectFit: "cover" }} className="rounded" alt={cart.course.title} />
+                                                                    </div>
+                                                                    <h6 className="mb-0 ms-lg-3 mt-2 mt-lg-0">
+                                                                        <a href="#" className='text-decoration-none text-dark'>{cart.course.title}</a>
+                                                                    </h6>
+                                                                </div>
+                                                            </td>
+                                                            <td className="text-center">
+                                                                <h5 className="text-success mb-0">৳{cart.price}</h5>
+                                                            </td>
+                                                            <td>
+                                                                <button onClick={() => cartItemDelete(cart.id)} type='button' className="btn btn-sm btn-danger px-2 mb-0">
+                                                                    <i className="fas fa-fw fa-times" />
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    ))
+                                                }
 
-                                                <tr>
-                                                    <td>
-                                                        <div className="d-lg-flex align-items-center">
-                                                            <div className="w-100px w-md-80px mb-2 mb-md-0">
-                                                                <img src="https://eduport.webestica.com/assets/images/courses/4by3/07.jpg" style={{ width: "100px", height: "70px", objectFit: "cover" }} className="rounded" alt="" />
-                                                            </div>
-                                                            <h6 className="mb-0 ms-lg-3 mt-2 mt-lg-0">
-                                                                <a href="#" className='text-decoration-none text-dark' >Building Scalable APIs with GraphQL</a>
-                                                            </h6>
-                                                        </div>
-                                                    </td>
-                                                    <td className="text-center">
-                                                        <h5 className="text-success mb-0">$350</h5>
-                                                    </td>
-                                                    <td>
-                                                        <button className="btn btn-sm btn-danger px-2 mb-0">
-                                                            <i className="fas fa-fw fa-times" />
-                                                        </button>
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td>
-                                                        <div className="d-lg-flex align-items-center">
-                                                            <div className="w-100px w-md-80px mb-2 mb-md-0">
-                                                                <img src="https://eduport.webestica.com/assets/images/courses/4by3/07.jpg" style={{ width: "100px", height: "70px", objectFit: "cover" }} className="rounded" alt="" />
-                                                            </div>
-                                                            <h6 className="mb-0 ms-lg-3 mt-2 mt-lg-0">
-                                                                <a href="#" className='text-decoration-none text-dark' >Building Scalable APIs with GraphQL</a>
-                                                            </h6>
-                                                        </div>
-                                                    </td>
-                                                    <td className="text-center">
-                                                        <h5 className="text-success mb-0">$350</h5>
-                                                    </td>
-                                                    <td>
-                                                        <button className="btn btn-sm btn-danger px-2 mb-0">
-                                                            <i className="fas fa-fw fa-times" />
-                                                        </button>
-                                                    </td>
-                                                </tr>
+                                                { carts?.length < 1 && <p className='mt-4 p-3 text-danger'>No Course in Cart! <Link to="/" className='btn btn-link'>Course Page</Link></p>}
                                             </tbody>
                                         </table>
                                     </div>
@@ -132,6 +156,7 @@ function Cart() {
                                                 className="form-control"
                                                 id="yourName"
                                                 placeholder="Name"
+                                                defaultValue={user?.full_name}
                                             />
                                         </div>
                                         {/* Email */}
@@ -144,9 +169,10 @@ function Cart() {
                                                 className="form-control"
                                                 id="emailInput"
                                                 placeholder="Email"
+                                                defaultValue={user?.email}
                                             />
                                         </div>
-                                        
+
                                         {/* Country option */}
                                         <div className="col-md-12 bg-light-input">
                                             <label htmlFor="mobileNumber" className="form-label">
@@ -157,6 +183,7 @@ function Cart() {
                                                 className="form-control"
                                                 id="mobileNumber"
                                                 placeholder="Country"
+                                                 defaultValue={user?.country}
                                             />
                                         </div>
 
@@ -168,18 +195,18 @@ function Cart() {
                             <div className="col-lg-4">
                                 <div className="p-4 shadow rounded-3">
                                     <h4 className="mb-3">Cart Total</h4>
-                                    <ul class="list-group mb-3">
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <ul className="list-group mb-3">
+                                        <li className="list-group-item d-flex justify-content-between align-items-center">
                                             Sub Total
-                                            <span>$10.99</span>
+                                            <span>৳ {cartStats?.price?.toFixed(2)}</span>
                                         </li>
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <li className="list-group-item d-flex justify-content-between align-items-center">
                                             Tax
-                                            <span>$0.99</span>
+                                            <span>৳ {cartStats?.total?.toFixed(2)}</span>
                                         </li>
-                                        <li class="list-group-item d-flex fw-bold justify-content-between align-items-center">
+                                        <li className="list-group-item d-flex fw-bold justify-content-between align-items-center">
                                             Total
-                                            <span className='fw-bold'>$8.99</span>
+                                            <span className='fw-bold'>৳ {cartStats?.total?.toFixed(2)}</span>
                                         </li>
                                     </ul>
                                     <div className="d-grid">
