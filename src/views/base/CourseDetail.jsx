@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import moment from 'moment'
-import Swal from 'sweetalert2'
 
 import BaseHeader from '../partials/BaseHeader'
 import BaseFooter from '../partials/BaseFooter'
@@ -10,6 +9,7 @@ import { Link, useParams } from 'react-router-dom'
 import { useAuthStore } from "../../store/auth";
 import CartId from '../plugin/CartId';
 import UserData from '../plugin/UserData'
+import Toast from '../plugin/Toast'
 
 
 function CourseDetail() {
@@ -27,6 +27,7 @@ function CourseDetail() {
             setIsLoading(false);
         })
     }
+    console.log('data', data);
 
     useEffect(() => {
         fetchCourse();
@@ -38,13 +39,11 @@ function CourseDetail() {
         }
     }, [])
 
-    console.log('current user: ', user);
-
     const addToCart = async (courseId, price, userId, country_name, cartId) => {
         console.log('add to cart called with:', { courseId, userId, price, country_name, cartId });
         setAddToCartBtn("Adding To Cart");
         if(!user) {
-            Swal.fire({
+            Toast().fire({
                     title: "Login first!",
                     icon: "error",
                     draggable: true
@@ -67,7 +66,7 @@ function CourseDetail() {
         try {
             const response = await useAxios().post(`course/cart/`, formData);
             console.log(response.data);
-            Swal.fire({
+            Toast().fire({
                     title: response.data.message,
                     icon: "success",
                     draggable: true
