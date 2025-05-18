@@ -9,6 +9,8 @@ import useAxios from '../../utils/useAxios'
 import { Link, useParams } from 'react-router-dom'
 import { useAuthStore } from "../../store/auth";
 import CartId from '../plugin/CartId';
+import UserData from '../plugin/UserData'
+
 
 function CourseDetail() {
     const params = useParams();
@@ -16,8 +18,8 @@ function CourseDetail() {
     const [addToCartBtn, setAddToCartBtn] = useState("Add To Cart");
     const [course, setCourse] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    // const allUserData = useAuthStore((state) => state.allUserData);
     const [user, setUser] = useState(null);
-    const allUserData = useAuthStore((state) => state.allUserData);
 
     const fetchCourse = () => {
         useAxios().get(`course/course-detail/${slug}/`).then(res => {
@@ -28,12 +30,15 @@ function CourseDetail() {
 
     useEffect(() => {
         fetchCourse();
-        if(allUserData) {
-            setUser(allUserData);
-            console.log('user', allUserData);
+        if(!user) {
+           const current_user = UserData();
+           if(current_user) {
+            setUser(current_user);
+           }
         }
-    }, [allUserData])
+    }, [])
 
+    console.log('current user: ', user);
 
     const addToCart = async (courseId, price, userId, country_name, cartId) => {
         console.log('add to cart called with:', { courseId, userId, price, country_name, cartId });

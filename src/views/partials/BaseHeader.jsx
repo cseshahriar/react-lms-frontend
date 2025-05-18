@@ -6,7 +6,6 @@ function BaseHeader() {
     const allUserData = useAuthStore((state) => state.allUserData);
 
     useEffect(() => {
-        console.log('allUserData: ', allUserData);
     }, [allUserData]);
 
 
