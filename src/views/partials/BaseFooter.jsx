@@ -8,11 +8,12 @@ function BaseFooter() {
           <div className="col-lg-4 col-md-6 col-12 text-white">
             {/* about company */}
             <div className="mb-4">
-              <h1>Shosen</h1>
+              <h1>ProMentor</h1>
               <div className="mt-4">
                 <p>
-                  Shosen is feature-rich components and beautifully Bootstrap UIKit
-                  for developers, built with bootstrap responsive framework.
+                 ProMentor is a professional mentor-driven learning management system that pairs professionals
+                 with industry experts for hands-on, career-focused learning and real-world projects base
+                 education system.
                 </p>
                 {/* social media */}
                 <div className="fs-4 mt-4">
@@ -129,14 +130,14 @@ function BaseFooter() {
             {/* contact info */}
             <div className="mb-4">
               <h3 className="fw-bold mb-3">Get in touch</h3>
-              <p>123 Main Street, U.S.A</p>
+              <p>123, Pallabi, Dhaka-1216</p>
               <p className="mb-1">
                 Email:
-                <a href="#" className='text-white'> support@desphixs.com</a>
+                <a href="mailto:support@promentor.com" className='text-white'> support@promentor.com</a>
               </p>
               <p>
                 Phone:
-                <span className="text-dark fw-semibold">(000) 123 456 789</span>
+                <a href="tel:+8801720-376755" className='text-white'> support@promentor.com</a>
               </p>
               <div className="d-flex">
                 <a href="#">
@@ -164,7 +165,7 @@ function BaseFooter() {
               <div className="me-4">
                 <span>
                   ©<span id="copyright5"></span>
-                  Shosen
+                  ProMentor
                 </span>
               </div>
               <div>
@@ -185,6 +186,7 @@ function BaseFooter() {
               </div>
             </div>
           </div>
+
           {/* Links */}
           <div className="col-12 col-md-2 d-md-flex justify-content-end">
             <div className="dropdown">

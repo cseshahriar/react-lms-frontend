@@ -17,15 +17,13 @@ import CategoryCarousel from './CategoryCarousel'
 
 function Index() {
     const navigate = useNavigate();
-    const allUserData = useAuthStore((state) => state.allUserData);
 
+    const allUserData = useAuthStore((state) => state.allUserData);
     const [user, setUser] = useState(null);
     const [courses, setCourses] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-
     const [cartCount, setCartCount] = useContext(CartContext);
     const cartId = CartId();
 

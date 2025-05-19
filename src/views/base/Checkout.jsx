@@ -1,10 +1,65 @@
-import { Link } from 'react-router-dom'
+import React, {useEffect, useState, useContext} from 'react';
+import { Link, useNavigate } from 'react-router-dom'
 
 import BaseHeader from '../partials/BaseHeader'
 import BaseFooter from '../partials/BaseFooter'
 
+import CartId from '../plugin/CartId';
+import apiInstance from '../../utils/axios';
+import Toast from '../plugin/Toast';
+import UserData from '../plugin/UserData'
+import { CartContext } from '../plugin/Context';
+import useAxios from '../../utils/useAxios'
 
 function Checkout() {
+    const navigate = useNavigate();
+    const [cartCount, setCartCount] = useContext(CartContext);
+    const [carts, setCarts] = useState([]);
+    const [cartStats, setCartStats] = useState([]);
+
+    const cartID = CartId();
+    const [user, setUser] = useState(null);
+
+    const [fullName, setFullName] = useState("");
+    const [email, setEmail] = useState("");
+    const [country, setCountry] = useState("");
+    const [mobile, setMobile] = useState("");
+
+       const fetchCartItems = async() => {
+        try {
+            console.log('cartID ', cartID);
+            await apiInstance.get(`course/cart-list/${cartID}`)
+                .then((response) => {
+                    setCarts(response.data);
+                    setCartCount(response.data?.length);
+                });
+
+            await apiInstance.get(`cart/stats/${cartID}`)
+                .then((response) => {
+                    setCartStats(response.data);
+                })
+        } catch (error) {
+            console.log('fetchCartItems', error);
+            Toast().fire({
+                    title: 'Something went wrong!',
+                    icon: "error",
+            });
+        }
+    }
+
+    useEffect(() => {
+        fetchCartItems();
+        if(!user) {
+            const current_user = UserData();
+            if(current_user) {
+            setUser(current_user);
+            setFullName(current_user.full_name);
+            setEmail(current_user.email);
+            setCountry(current_user.country);
+            }
+        }
+    }, [user, ])
+
     return (
         <>
             <BaseHeader />
@@ -20,13 +75,13 @@ function Checkout() {
                                     <nav aria-label="breadcrumb">
                                         <ol className="breadcrumb breadcrumb-dots mb-0">
                                             <li className="breadcrumb-item">
-                                                <a href="#" className='text-decoration-none text-dark'>Home</a>
+                                                <Link to="/" className='text-decoration-none text-dark'>Home</Link>
                                             </li>
                                             <li className="breadcrumb-item">
-                                                <a href="#" className='text-decoration-none text-dark'>Courses</a>
+                                                <Link to="/" className='text-decoration-none text-dark'>Courses</Link>
                                             </li>
                                             <li className="breadcrumb-item">
-                                                <a href="#" className='text-decoration-none text-dark'>Cart</a>
+                                                <Link to="/cart" className='text-decoration-none text-dark'>Cart</Link>
                                             </li>
                                             <li className="breadcrumb-item active" aria-current="page">
                                                 Checkout
@@ -60,55 +115,26 @@ function Checkout() {
                                 <div className="table-responsive border-0 rounded-3">
                                     <table className="table align-middle p-4 mb-0">
                                         <tbody className="border-top-2">
-                                            <tr>
-                                                <td>
-                                                    <div className="d-lg-flex align-items-center">
-                                                        <div className="w-100px w-md-80px mb-2 mb-md-0">
-                                                            <img src="https://eduport.webestica.com/assets/images/courses/4by3/07.jpg" style={{ width: "100px", height: "70px", objectFit: "cover" }} className="rounded" alt="" />
-                                                        </div>
-                                                        <h6 className="mb-0 ms-lg-3 mt-2 mt-lg-0">
-                                                            <a href="#" className='text-decoration-none text-dark' >Building Scalable APIs with GraphQL</a>
-                                                        </h6>
-                                                    </div>
-                                                </td>
-                                                <td className="text-center">
-                                                    <h5 className="text-success mb-0">$350</h5>
-                                                </td>
+                                            {
+                                                    carts?.map((cart, index) => (
+                                                        <tr key={index}>
+                                                            <td>
+                                                                <div className="d-lg-flex align-items-center">
+                                                                    <div className="w-100px w-md-80px mb-2 mb-md-0">
+                                                                        <img src={cart.course?.image} style={{ width: "100px", height: "70px", objectFit: "cover" }} className="rounded" alt={cart.course.title} />
+                                                                    </div>
+                                                                    <h6 className="mb-0 ms-lg-3 mt-2 mt-lg-0">
+                                                                        <a href="#" className='text-decoration-none text-dark'>{cart.course.title}</a>
+                                                                    </h6>
+                                                                </div>
+                                                            </td>
+                                                            <td className="text-center">
+                                                                <h5 className="text-success mb-0">৳{cart.price}</h5>
+                                                            </td>
+                                                        </tr>
+                                                    ))
+                                                }
 
-                                            </tr>
-
-                                            <tr>
-                                                <td>
-                                                    <div className="d-lg-flex align-items-center">
-                                                        <div className="w-100px w-md-80px mb-2 mb-md-0">
-                                                            <img src="https://eduport.webestica.com/assets/images/courses/4by3/07.jpg" style={{ width: "100px", height: "70px", objectFit: "cover" }} className="rounded" alt="" />
-                                                        </div>
-                                                        <h6 className="mb-0 ms-lg-3 mt-2 mt-lg-0">
-                                                            <a href="#" className='text-decoration-none text-dark' >Building Scalable APIs with GraphQL</a>
-                                                        </h6>
-                                                    </div>
-                                                </td>
-                                                <td className="text-center">
-                                                    <h5 className="text-success mb-0">$350</h5>
-                                                </td>
-                                            </tr>
-
-                                            <tr>
-                                                <td>
-                                                    <div className="d-lg-flex align-items-center">
-                                                        <div className="w-100px w-md-80px mb-2 mb-md-0">
-                                                            <img src="https://eduport.webestica.com/assets/images/courses/4by3/07.jpg" style={{ width: "100px", height: "70px", objectFit: "cover" }} className="rounded" alt="" />
-                                                        </div>
-                                                        <h6 className="mb-0 ms-lg-3 mt-2 mt-lg-0">
-                                                            <a href="#" className='text-decoration-none text-dark' >Building Scalable APIs with GraphQL</a>
-                                                        </h6>
-                                                    </div>
-                                                </td>
-                                                <td className="text-center">
-                                                    <h5 className="text-success mb-0">$350</h5>
-                                                </td>
-
-                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -118,52 +144,73 @@ function Checkout() {
                             <div className="shadow p-4 rounded-3 mt-5">
                                 <h5 className="mb-0">Personal Details</h5>
                                 <form className="row g-3 mt-0">
-                                    <div className="col-md-12 bg-light-input">
-                                        <label htmlFor="yourName" className="form-label">
-                                            Your name *
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            id="yourName"
-                                            placeholder="Name"
-                                        />
-                                    </div>
-                                    <div className="col-md-6 bg-light-input">
-                                        <label htmlFor="emailInput" className="form-label">
-                                            Email address *
-                                        </label>
-                                        <input
-                                            type="email"
-                                            className="form-control"
-                                            id="emailInput"
-                                            placeholder="Email"
-                                        />
-                                    </div>
-                                    <div className="col-md-6 bg-light-input">
-                                        <label htmlFor="mobileNumber" className="form-label">
-                                            Mobile number *
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            id="mobileNumber"
-                                            placeholder="Mobile number"
-                                        />
-                                    </div>
-                                    {/* Country option */}
-                                    <div className="col-md-12 bg-light-input">
-                                        <label htmlFor="mobileNumber" className="form-label">
-                                            Select country *
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            id="mobileNumber"
-                                            placeholder="Country"
-                                        />
-                                    </div>
+                                    <div className="row g-3 mt-0">
 
+                                        <div className="col-md-12 bg-light-input">
+                                            <label htmlFor="yourName" className="form-label">
+                                                Your name *
+                                            </label>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                id="yourName"
+                                                placeholder="Name"
+                                                name='name'
+                                                value={fullName}
+                                                onChange={(e) => setFullName(e.target.value)}
+                                                required
+                                            />
+                                        </div>
+
+                                        <div className="col-md-12 bg-light-input">
+                                            <label htmlFor="emailInput" className="form-label">
+                                                Email address *
+                                            </label>
+                                            <input
+                                                type="email"
+                                                className="form-control"
+                                                id="emailInput"
+                                                placeholder="Email"
+                                                name='email'
+                                                value={email}
+                                                onChange={(e) => setEmail(e.target.value)}
+                                                required
+                                            />
+                                        </div>
+
+                                        <div className="col-md-6 bg-light-input">
+                                            <label htmlFor="mobileNumber" className="form-label">
+                                                Mobile number *
+                                            </label>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                id="mobileNumber"
+                                                name='mobile'
+                                                placeholder="Mobile number"
+                                                value={mobile}
+                                                onChange={(e) => setMobile(e.target.value)}
+                                                required
+                                            />
+                                        </div>
+
+
+                                        <div className="col-md-12 bg-light-input">
+                                            <label htmlFor="mobileNumber" className="form-label">
+                                                Select country *
+                                            </label>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                id="country"
+                                                name='country'
+                                                placeholder="Country"
+                                                value={country}
+                                                onChange={(e) => setCountry(e.target.value)}
+                                                required
+                                            />
+                                        </div>
+                                    </div>
                                 </form>
                                 {/* Form END */}
                             </div>
@@ -254,22 +301,23 @@ function Checkout() {
 
                                         <div className="p-3 shadow rounded-3 mt-3">
                                             <h4 className="mb-3">Cart Total</h4>
-                                            <ul class="list-group mb-3">
-                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <ul className="list-group mb-3">
+                                                <li className="list-group-item d-flex justify-content-between align-items-center">
                                                     Sub Total
-                                                    <span>$10.99</span>
+                                                    <span>৳ {cartStats?.price?.toFixed(2)}</span>
                                                 </li>
-                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <li className="list-group-item d-flex justify-content-between align-items-center">
                                                     Discount
-                                                    <span>$2.99</span>
+                                                    <span>৳ 0</span>
                                                 </li>
-                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+
+                                                <li className="list-group-item d-flex justify-content-between align-items-center">
                                                     Tax
-                                                    <span>$0.99</span>
+                                                    <span>৳ {cartStats?.total?.toFixed(2)}</span>
                                                 </li>
-                                                <li class="list-group-item d-flex fw-bold justify-content-between align-items-center">
+                                                <li className="list-group-item d-flex fw-bold justify-content-between align-items-center">
                                                     Total
-                                                    <span className='fw-bold'>$8.99</span>
+                                                    <span className='fw-bold'>৳ {cartStats?.total?.toFixed(2)}</span>
                                                 </li>
                                             </ul>
                                             <div className="d-grid">

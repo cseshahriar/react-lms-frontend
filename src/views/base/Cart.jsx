@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import BaseHeader from '../partials/BaseHeader'
 import BaseFooter from '../partials/BaseFooter'
@@ -9,33 +9,40 @@ import apiInstance from '../../utils/axios';
 import Toast from '../plugin/Toast';
 import UserData from '../plugin/UserData'
 import { CartContext } from '../plugin/Context';
+import useAxios from '../../utils/useAxios'
 
 function Cart() {
+    const navigate = useNavigate();
     const [cartCount, setCartCount] = useContext(CartContext);
     const [carts, setCarts] = useState([]);
     const [cartStats, setCartStats] = useState([]);
+
     const cartID = CartId();
     const [user, setUser] = useState(null);
 
+    const [fullName, setFullName] = useState("");
+    const [email, setEmail] = useState("");
+    const [country, setCountry] = useState("");
+
+
     const fetchCartItems = async() => {
         try {
+            console.log('cartID ', cartID);
             await apiInstance.get(`course/cart-list/${cartID}`)
                 .then((response) => {
-                    console.log('carts: ', response.data);
                     setCarts(response.data);
                     setCartCount(response.data?.length);
                 });
 
             await apiInstance.get(`cart/stats/${cartID}`)
                 .then((response) => {
-                    console.log('stats: ', response.data);
                     setCartStats(response.data);
                 })
         } catch (error) {
+            console.log('fetchCartItems', error);
             Toast().fire({
-                    title: error.data.message,
+                    title: 'Something went wrong!',
                     icon: "error",
-                    draggable: true
             });
         }
     }
@@ -52,8 +59,42 @@ function Cart() {
                 });
             });
         } catch (error) {
+            console.log('cartItemDelete error: ', error);
             Toast().fire({
-                title: error.data.message,
+                title: "Something went wrong!",
+                icon: "error",
+            });
+        }
+    }
+
+    const createOrder = async(e) => {
+        e.preventDefault();
+        if(!user) {
+            Toast().fire({
+                title: "Please login first!",
+                icon: "error",
+            });
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("full_name", fullName);
+        formData.append("email", email);
+        formData.append("country", country);
+        formData.append("user_id", user?.user_id);
+        formData.append("cart_id", cartID);
+        console.log('form data: ', formData);
+
+        try {
+            await useAxios().post(`order/create-order/`, formData)
+                .then((response) => {
+                    console.log('create order', response.data);
+                    navigate(`/checkout/${response.data.order_oid}`);
+                });
+        } catch (error) {
+            console.log('createOrder error: ', error);
+            Toast().fire({
+                title: "Something went wrong!",
                 icon: "error",
             });
         }
@@ -65,10 +106,12 @@ function Cart() {
            const current_user = UserData();
            if(current_user) {
             setUser(current_user);
+            setFullName(current_user.full_name);
+            setEmail(current_user.email);
+            setCountry(current_user.country);
            }
         }
-    }, [])
-
+    }, [user, ])
 
     return (
         <>
@@ -104,7 +147,7 @@ function Cart() {
 
             <section className="pt-5">
                 <div className="container">
-                    <form  >
+                    <form  onSubmit={createOrder}>
                         <div className="row g-4 g-sm-5">
                             {/* Main content START */}
                             <div className="col-lg-8 mb-4 mb-sm-0">
@@ -161,7 +204,10 @@ function Cart() {
                                                 className="form-control"
                                                 id="yourName"
                                                 placeholder="Name"
-                                                defaultValue={user?.full_name}
+                                                name='name'
+                                                value={fullName}
+                                                onChange={(e) => setFullName(e.target.value)}
+                                                required
                                             />
                                         </div>
                                         {/* Email */}
@@ -174,7 +220,10 @@ function Cart() {
                                                 className="form-control"
                                                 id="emailInput"
                                                 placeholder="Email"
-                                                defaultValue={user?.email}
+                                                name='email'
+                                                value={email}
+                                                onChange={(e) => setEmail(e.target.value)}
+                                                required
                                             />
                                         </div>
 
@@ -186,9 +235,12 @@ function Cart() {
                                             <input
                                                 type="text"
                                                 className="form-control"
-                                                id="mobileNumber"
+                                                id="country"
+                                                name='country'
                                                 placeholder="Country"
-                                                 defaultValue={user?.country}
+                                                value={country}
+                                                onChange={(e) => setCountry(e.target.value)}
+                                                required
                                             />
                                         </div>
 
@@ -214,11 +266,13 @@ function Cart() {
                                             <span className='fw-bold'>৳ {cartStats?.total?.toFixed(2)}</span>
                                         </li>
                                     </ul>
+
                                     <div className="d-grid">
-                                        <Link to={`/checkout/`} className="btn btn-lg btn-success">
+                                        <button type='submit' className="btn btn-lg btn-success">
                                             Proceed to Checkout
-                                        </Link>
+                                        </button>
                                     </div>
+
                                     <p className="small mb-0 mt-2 text-center">
                                         By proceeding to checkout, you agree to these{" "}<a href="#"> <strong>Terms of Service</strong></a>
                                     </p>
