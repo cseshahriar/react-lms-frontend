@@ -1,4 +1,4 @@
-import React, {useState, useEffect } from 'react'
+import React, {useState, useEffect, useContext } from 'react'
 import { Link } from 'react-router-dom'
 
 import BaseHeader from '../partials/BaseHeader'
@@ -8,8 +8,10 @@ import CartId from '../plugin/CartId';
 import apiInstance from '../../utils/axios';
 import Toast from '../plugin/Toast';
 import UserData from '../plugin/UserData'
+import { CartContext } from '../plugin/Context';
 
 function Cart() {
+    const [cartCount, setCartCount] = useContext(CartContext);
     const [carts, setCarts] = useState([]);
     const [cartStats, setCartStats] = useState([]);
     const cartID = CartId();
@@ -21,6 +23,7 @@ function Cart() {
                 .then((response) => {
                     console.log('carts: ', response.data);
                     setCarts(response.data);
+                    setCartCount(response.data?.length);
                 });
 
             await apiInstance.get(`cart/stats/${cartID}`)
@@ -37,21 +40,12 @@ function Cart() {
         }
     }
 
-    useEffect(() => {
-        fetchCartItems();
-        if(!user) {
-           const current_user = UserData();
-           if(current_user) {
-            setUser(current_user);
-           }
-        }
-    }, [])
-
     const cartItemDelete = async(itemId) => {
         try {
             await apiInstance.delete(`course/cart-item-delete/${cartID}/${itemId}/`)
             .then((response) => {
-                fetchCartItems();
+                fetchCartItems(response.data);
+                setCartCount(response.data?.length);
                 Toast().fire({
                     title: "Cart item removed successfully",
                     icon: "success",
@@ -64,6 +58,17 @@ function Cart() {
             });
         }
     }
+
+    useEffect(() => {
+        fetchCartItems();
+        if(!user) {
+           const current_user = UserData();
+           if(current_user) {
+            setUser(current_user);
+           }
+        }
+    }, [])
+
 
     return (
         <>
@@ -134,9 +139,9 @@ function Cart() {
                                                     ))
                                                 }
 
-                                                { carts?.length < 1 && <p className='mt-4 p-3 text-danger'>No Course in Cart! <Link to="/" className='btn btn-link'>Course Page</Link></p>}
                                             </tbody>
                                         </table>
+                                        { carts?.length < 1 && <p className='mt-4 p-3 text-danger'>No Course in Cart! <Link to="/" className='btn btn-link'>Course Page</Link></p>}
                                     </div>
                                 </div>
 

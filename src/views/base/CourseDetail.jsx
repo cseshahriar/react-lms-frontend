@@ -1,16 +1,16 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import moment from 'moment'
 
 import BaseHeader from '../partials/BaseHeader'
 import BaseFooter from '../partials/BaseFooter'
-import useAxios from '../../utils/useAxios'
 
 import { Link, useParams, useNavigate } from 'react-router-dom'
-import { useAuthStore } from "../../store/auth";
 import CartId from '../plugin/CartId';
 import UserData from '../plugin/UserData'
 import Toast from '../plugin/Toast'
 
+import { CartContext } from '../plugin/Context'
+import apiInstance from '../../utils/axios'
 
 function CourseDetail() {
     const navigate = useNavigate();
@@ -19,11 +19,13 @@ function CourseDetail() {
     const [addToCartBtn, setAddToCartBtn] = useState("Add To Cart");
     const [course, setCourse] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    // const allUserData = useAuthStore((state) => state.allUserData);
     const [user, setUser] = useState(null);
+    const cartId = CartId();
+
+    const [cartCount, setCartCount] = useContext(CartContext);
 
     const fetchCourse = () => {
-        useAxios().get(`course/course-detail/${slug}/`).then(res => {
+        apiInstance.get(`course/course-detail/${slug}/`).then(res => {
             setCourse(res.data);
             setIsLoading(false);
         })
@@ -37,7 +39,7 @@ function CourseDetail() {
             setUser(current_user);
            }
         }
-    }, [])
+    }, [cartCount])
 
     const addToCart = async (courseId, price, userId, country_name, cartId) => {
         console.log('add to cart called with:', { courseId, userId, price, country_name, cartId });
@@ -64,20 +66,25 @@ function CourseDetail() {
         }
 
         try {
-            const response = await useAxios().post(`course/cart/`, formData);
-            console.log(response.data);
+            const response = await apiInstance.post(`course/cart/`, formData);
             Toast().fire({
                     title: response.data.message,
                     icon: "success",
                     draggable: true
             });
             setAddToCartBtn("Added To Cart");
-            return response.data; // Consider returning the response data
         } catch (error) {
             console.error("Error adding to cart:", error);
             setAddToCartBtn("Add To Cart");
             throw error; // Re-throw the error so calling code can handle it
         }
+
+        // set cart count
+        await apiInstance.get(`course/cart-list/${cartId}`)
+            .then((response) => {
+                console.log('cart course after add cart : ', response.data.length);
+                setCartCount(response.data?.length);
+        })
     }
 
     const enrolment = (courseId, price, userId, country_name, cartId) => {

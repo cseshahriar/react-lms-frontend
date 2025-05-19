@@ -1,4 +1,4 @@
-import {useState, useEffect } from 'react'
+import {useState, useEffect, useContext } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import moment from 'moment'
 import Swal from 'sweetalert2'
@@ -7,9 +7,11 @@ import BaseHeader from '../partials/BaseHeader'
 import BaseFooter from '../partials/BaseFooter'
 import Pagination from '../partials/Pagination'
 
-import useAxios from '../../utils/useAxios'
+import apiInstance from '../../utils/axios'
 import { useAuthStore } from "../../store/auth";
 import CartId from '../plugin/CartId';
+
+import { CartContext } from '../plugin/Context'
 
 function Index() {
     const navigate = useNavigate();
@@ -22,15 +24,18 @@ function Index() {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
+    const [cartCount, setCartCount] = useContext(CartContext);
+    const cartId = CartId();
+
     const fetchCourses = async (page = 1) => {
         try {
             setIsLoading(true);
-            const response = await useAxios().get(`course/course-list/?page=${page}`);
+            const response = await apiInstance.get(`course/course-list/?page=${page}`);
             setCourses(response.data.results);
             setTotalPages(response.data.total_pages);
             setCurrentPage(response.data.current_page);
         } catch (error) {
-            console.error('Error fetching courses:', error);
+            console.log('Error fetching courses:', error);
         } finally {
             setIsLoading(false);
         }
@@ -42,7 +47,7 @@ function Index() {
             setUser(allUserData);
             console.log('user', allUserData);
         }
-    }, [allUserData])
+    }, [cartCount, allUserData])
 
     const handlePageChange = (page) => {
         fetchCourses(page);
@@ -73,18 +78,29 @@ function Index() {
         }
 
         try {
-            const response = await useAxios().post(`course/cart/`, formData);
-            console.log(response.data);
+            await apiInstance.post(`course/cart/`, formData);
             Swal.fire({
-                    title: response.data.message,
+                    title: 'Add to cart successfully',
                     icon: "success",
                     draggable: true
             });
-            return response.data; // Consider returning the response data
+
+            // set cart count
+            await apiInstance.get(`course/cart-list/${cartId}`)
+            .then((response) => {
+                setCartCount(response.data?.length);
+            });
         } catch (error) {
             console.error("Error adding to cart:", error);
             throw error; // Re-throw the error so calling code can handle it
         }
+
+        // set cart count
+        await apiInstance.get(`course/cart-list/${cartId}`)
+            .then((response) => {
+                console.log('cart course after add cart : ', response.data.length);
+                setCartCount(response.data?.length);
+        })
     }
 
     const enrolment = (courseId, price, userId, country_name, cartId) => {
