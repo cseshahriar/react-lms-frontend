@@ -12,6 +12,7 @@ import { useAuthStore } from "../../store/auth";
 import CartId from '../plugin/CartId';
 
 import { CartContext } from '../plugin/Context'
+import CategoryCarousel from './CategoryCarousel'
 
 function Index() {
     const navigate = useNavigate();
@@ -107,6 +108,12 @@ function Index() {
         addToCart(courseId, price, userId, country_name, cartId);
         navigate('/cart');
     }
+
+    const categories = [
+        "Featured", "Frontend", "Backend", "DevOps",
+        "AI/ML", "Cybersecurity", "Blockchain", "UI/UX",
+        "Data Science", "Mobile", "QA Testing", "Cloud"
+    ];
 
     return (
         <>
@@ -223,7 +230,8 @@ function Index() {
 
             <section className='mb-5'>
                 <div className="container mb-lg-8 ">
-                    <div className="row mb-5 mt-3">
+
+                    <div className="row mb-3 mt-3">
                         {/* col */}
                         <div className="col-12">
                             <div className="mb-6">
@@ -235,6 +243,14 @@ function Index() {
                             </div>
                         </div>
                     </div>
+
+                    {/** Category slider */}
+                    <div className="row py-3 mb-5">
+                        <div className="col-md-12">
+                            <CategoryCarousel categories={categories} />
+                        </div>
+                    </div>
+
                     <div className="row">
                         <div className="col-md-12">
                             <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
