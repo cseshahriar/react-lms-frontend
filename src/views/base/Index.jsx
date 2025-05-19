@@ -2,6 +2,7 @@ import {useState, useEffect, useContext } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import moment from 'moment'
 import Swal from 'sweetalert2'
+import Rater from 'react-rater';
 
 import BaseHeader from '../partials/BaseHeader'
 import BaseFooter from '../partials/BaseFooter'
@@ -132,7 +133,7 @@ function Index() {
                                     Most trusted education platform
                                 </h5>
                                 {/* heading */}
-                                <h1 className="display-3 fw-bold mb-3">
+                                <h1 className="display-4 fw-bold mb-3">
                                     Grow your skills and advance career
                                 </h1>
                                 {/* para */}
@@ -235,9 +236,9 @@ function Index() {
                         {/* col */}
                         <div className="col-12">
                             <div className="mb-6">
-                                <h2 className="mb-1 h1">🔥Most Popular Courses</h2>
+                                <h2 className="mb-1 h1">Upcoming Live Courses</h2>
                                 <p>
-                                    These are the most popular courses among Geeks Courses learners
+                                    These are the most demandable upcoming courses among geeks courses learners
                                     worldwide in year 2025
                                 </p>
                             </div>
@@ -321,7 +322,7 @@ function Index() {
                                                     </div>
                                                     <div className="col-auto">
                                                         <button
-                                                            type='button' className="text-inherit text-decoration-none btn btn-primary me-2"
+                                                            type='button' className="btn-sm text-inherit text-decoration-none btn btn-primary me-2"
                                                             onClick={
                                                                 () => addToCart(
                                                                     course.id,
@@ -345,7 +346,7 @@ function Index() {
                                                                     CartId()
                                                                 )
                                                             }
-                                                            type='button'  className="text-inherit text-decoration-none btn btn-primary">
+                                                            type='button'  className="btn-sm text-inherit text-decoration-none btn btn-primary">
                                                             Enroll Now <i className="fas fa-arrow-right text-primary align-middle me-2 text-white" />
                                                         </button>
                                                     </div>
