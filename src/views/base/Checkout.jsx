@@ -1,6 +1,6 @@
 import React, {useEffect, useState, useContext} from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom'
-
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import BaseHeader from '../partials/BaseHeader'
 import BaseFooter from '../partials/BaseFooter'
 
@@ -10,6 +10,13 @@ import Toast from '../plugin/Toast';
 import UserData from '../plugin/UserData'
 import { CartContext } from '../plugin/Context';
 import useAxios from '../../utils/useAxios'
+import { PAYPAL_CLIENT_ID } from '../../utils/constants';
+
+// Renders errors or successful transactions on the screen.
+function Message({ content }) {
+    return <p>{content}</p>;
+}
+
 
 function Checkout() {
     const params = useParams();
@@ -78,7 +85,18 @@ function Checkout() {
         }
     }, [])
 
-    console.log(order);
+    // https://developer.paypal.com/studio/checkout/standard/integrate
+    // paypal
+    const initialOptions = {
+        clientId: PAYPAL_CLIENT_ID,
+        currency: "USD",
+        intent: "capture",
+    };
+    const styles = {
+        shape: "rect",
+        layout: "vertical",  // horizontal
+    };
+    const [message, setMessage] = useState("");
 
     return (
         <>
@@ -286,7 +304,38 @@ function Checkout() {
                                                 </li>
                                             </ul>
                                             <div className="d-grid">
-                                                <Link to={`/success/txn_id/`} className="btn btn-lg btn-success mt-2"> Pay With PayPal</Link>
+                                                <PayPalScriptProvider options={initialOptions}>
+                                                    <PayPalButtons className='mt-3'
+                                                        style={styles}
+                                                        createOrder={(data, actions) => {
+                                                            return actions.order.create({
+                                                                purchase_units: [
+                                                                    {
+                                                                        amount: {
+                                                                            currency_code: "USD",
+                                                                            value: order.total.toString(),
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            })
+                                                        }}
+
+                                                        onApprove={(data, actions) => {
+                                                            return actions.order.capture().then((details) => {
+                                                                const name = details.payer.name.given_name;
+                                                                const status = details.status;
+                                                                const paypal_order_id = data.orderID;
+
+                                                                console.log(status);
+                                                                if (status === "COMPLETED") {
+                                                                    navigate(`/payment-success/${order.oid}/?paypal_order_id=${paypal_order_id}`)
+                                                                }
+                                                            })
+                                                        }}
+                                                    />
+                                                </PayPalScriptProvider>
+                                                <Message content={message} />
+
                                                 <Link to={`/success/txn_id/`} className="btn btn-lg btn-success mt-2"> Pay With Stripe</Link>
                                             </div>
                                             <p className="small mb-0 mt-2 text-center">
