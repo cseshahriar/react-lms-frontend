@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useContext} from 'react';
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 
 import BaseHeader from '../partials/BaseHeader'
 import BaseFooter from '../partials/BaseFooter'
@@ -12,12 +12,12 @@ import { CartContext } from '../plugin/Context';
 import useAxios from '../../utils/useAxios'
 
 function Checkout() {
+    const params = useParams();
     const navigate = useNavigate();
-    const [cartCount, setCartCount] = useContext(CartContext);
-    const [carts, setCarts] = useState([]);
-    const [cartStats, setCartStats] = useState([]);
 
-    const cartID = CartId();
+    const [coupon, setCoupon] = useState("");
+
+    const [order, setOrder] = useState([]);
     const [user, setUser] = useState(null);
 
     const [fullName, setFullName] = useState("");
@@ -25,30 +25,48 @@ function Checkout() {
     const [country, setCountry] = useState("");
     const [mobile, setMobile] = useState("");
 
-       const fetchCartItems = async() => {
+    const fetchOrder = async() => {
         try {
-            console.log('cartID ', cartID);
-            await apiInstance.get(`course/cart-list/${cartID}`)
+            await useAxios().get(`order/checkout/${params.order_oid}`)
                 .then((response) => {
-                    setCarts(response.data);
-                    setCartCount(response.data?.length);
+                    setOrder(response.data);
                 });
-
-            await apiInstance.get(`cart/stats/${cartID}`)
-                .then((response) => {
-                    setCartStats(response.data);
-                })
         } catch (error) {
-            console.log('fetchCartItems', error);
+            console.log('fetchOrder', error);
             Toast().fire({
-                    title: 'Something went wrong!',
+                    title: 'Something went wrong for order fetching',
                     icon: "error",
             });
         }
     }
 
+    const applyCoupon = async() => {
+        const forData = new FormData();
+        forData.append('order_oid', order.oid);
+        forData.append('coupon_code', coupon);
+
+        if(coupon && order.oid) {
+            try {
+                 await useAxios().post(`order/coupon/`, forData)
+                .then((response) => {
+                    fetchOrder();
+                    Toast().fire({
+                        title: response.data?.message,
+                        icon: response.data?.icon
+                    })
+                });
+            } catch (error) {
+                console.log('coupon error', error);
+                Toast().fire({
+                        title: "Invalid coupon!. Please remove whitespace if given.",
+                        icon: "error"
+                })
+            }
+        }
+    }
+
     useEffect(() => {
-        fetchCartItems();
+        fetchOrder();
         if(!user) {
             const current_user = UserData();
             if(current_user) {
@@ -58,7 +76,9 @@ function Checkout() {
             setCountry(current_user.country);
             }
         }
-    }, [user, ])
+    }, [])
+
+    console.log(order);
 
     return (
         <>
@@ -115,25 +135,24 @@ function Checkout() {
                                 <div className="table-responsive border-0 rounded-3">
                                     <table className="table align-middle p-4 mb-0">
                                         <tbody className="border-top-2">
-                                            {
-                                                    carts?.map((cart, index) => (
-                                                        <tr key={index}>
-                                                            <td>
-                                                                <div className="d-lg-flex align-items-center">
-                                                                    <div className="w-100px w-md-80px mb-2 mb-md-0">
-                                                                        <img src={cart.course?.image} style={{ width: "100px", height: "70px", objectFit: "cover" }} className="rounded" alt={cart.course.title} />
-                                                                    </div>
-                                                                    <h6 className="mb-0 ms-lg-3 mt-2 mt-lg-0">
-                                                                        <a href="#" className='text-decoration-none text-dark'>{cart.course.title}</a>
-                                                                    </h6>
-                                                                </div>
-                                                            </td>
-                                                            <td className="text-center">
-                                                                <h5 className="text-success mb-0">৳{cart.price}</h5>
-                                                            </td>
-                                                        </tr>
-                                                    ))
-                                                }
+                                            {order?.order_items?.map((item, index) => (
+                                                <tr key={index}>
+                                                    <td>
+                                                        <div className="d-lg-flex align-items-center">
+                                                            <div className="w-100px w-md-80px mb-2 mb-md-0">
+                                                                <img src={item.course?.image} style={{ width: "100px", height: "70px", objectFit: "cover" }} className="rounded" alt={item.course.title} />
+                                                            </div>
+                                                            <h6 className="mb-0 ms-lg-3 mt-2 mt-lg-0">
+                                                                <a href="#" className='text-decoration-none text-dark'>{item.course.title}</a>
+                                                            </h6>
+                                                        </div>
+                                                    </td>
+                                                    <td className="text-center">
+                                                        <h5 className="text-success mb-0">৳{item.price}</h5>
+                                                    </td>
+                                                </tr>
+                                                ))
+                                            }
 
                                         </tbody>
                                     </table>
@@ -229,73 +248,19 @@ function Checkout() {
 
                                         </div>
 
-                                        {/* Course item START */}
-                                        <div className="row g-2 shadow p-2 mb-4 rounded-3">
-                                            <div className="col-sm-4">
-                                                <img src="https://eduport.webestica.com/assets/images/courses/4by3/07.jpg" className="rounded" style={{ width: "100px", height: "70px", objectFit: "cover" }} alt="" />
-                                            </div>
-                                            <div className="col-sm-8">
-                                                <h6 className="mb-0">
-                                                    <a href="#" className='text-decoration-none text-dark'>Building Scalable APIs with GraphQL</a>
-                                                </h6>
-                                                <div className="d-flex justify-content-between align-items-center mt-3">
-                                                    <span className="text-success fw-bold">$150</span>
-                                                    <div className="text-primary-hover">
-                                                        <Link to="/cart/" className="text-body me-2">
-                                                            <i className="bi bi-pencil-square me-1" />
-                                                            Edit
-                                                        </Link>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-
-                                        {/* Course item START */}
-                                        <div className="row g-2 shadow p-2 mb-4 rounded-3">
-                                            <div className="col-sm-4">
-                                                <img src="https://eduport.webestica.com/assets/images/courses/4by3/07.jpg" className="rounded" style={{ width: "100px", height: "70px", objectFit: "cover" }} alt="" />
-                                            </div>
-                                            <div className="col-sm-8">
-                                                <h6 className="mb-0">
-                                                    <a href="#" className='text-decoration-none text-dark'>Building Scalable APIs with GraphQL</a>
-                                                </h6>
-                                                <div className="d-flex justify-content-between align-items-center mt-3">
-                                                    <span className="text-success fw-bold">$150</span>
-                                                    <div className="text-primary-hover">
-                                                        <Link to="/cart/" className="text-body me-2">
-                                                            <i className="bi bi-pencil-square me-1" />
-                                                            Edit
-                                                        </Link>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-
-                                        {/* Course item START */}
-                                        <div className="row g-2 shadow p-2 mb-4 rounded-3">
-                                            <div className="col-sm-4">
-                                                <img src="https://eduport.webestica.com/assets/images/courses/4by3/07.jpg" className="rounded" style={{ width: "100px", height: "70px", objectFit: "cover" }} alt="" />
-                                            </div>
-                                            <div className="col-sm-8">
-                                                <h6 className="mb-0">
-                                                    <a href="#" className='text-decoration-none text-dark'>Building Scalable APIs with GraphQL</a>
-                                                </h6>
-                                                <div className="d-flex justify-content-between align-items-center mt-3">
-                                                    <span className="text-success fw-bold">$150</span>
-                                                    <div className="text-primary-hover">
-                                                        <Link to="/cart/" className="text-body me-2">
-                                                            <i className="bi bi-pencil-square me-1" />
-                                                            Edit
-                                                        </Link>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        {/** coupon */}
                                         <div className="input-group mt-5">
-                                            <input className="form-control form-control" placeholder="COUPON CODE" />
-                                            <button type="button" className="btn btn-primary">Apply</button>
+                                            <input
+                                                name='coupon_code'
+                                                className="form-control form-control"
+                                                placeholder="COUPON CODE"
+                                                onChange={(e) => setCoupon(e.target.value)}
+                                            />
+                                            <button
+                                                type="button"
+                                                className="btn btn-primary"
+                                                onClick={applyCoupon}
+                                            >Apply</button>
                                         </div>
 
 
@@ -304,20 +269,20 @@ function Checkout() {
                                             <ul className="list-group mb-3">
                                                 <li className="list-group-item d-flex justify-content-between align-items-center">
                                                     Sub Total
-                                                    <span>৳ {cartStats?.price?.toFixed(2)}</span>
+                                                    <span>৳ {order?.sub_total}</span>
                                                 </li>
                                                 <li className="list-group-item d-flex justify-content-between align-items-center">
                                                     Discount
-                                                    <span>৳ 0</span>
+                                                    <span>৳ {order.saved}</span>
                                                 </li>
 
                                                 <li className="list-group-item d-flex justify-content-between align-items-center">
                                                     Tax
-                                                    <span>৳ {cartStats?.total?.toFixed(2)}</span>
+                                                    <span>৳ {order?.tax_fee}</span>
                                                 </li>
                                                 <li className="list-group-item d-flex fw-bold justify-content-between align-items-center">
                                                     Total
-                                                    <span className='fw-bold'>৳ {cartStats?.total?.toFixed(2)}</span>
+                                                    <span className='fw-bold'>৳ {order?.total}</span>
                                                 </li>
                                             </ul>
                                             <div className="d-grid">
