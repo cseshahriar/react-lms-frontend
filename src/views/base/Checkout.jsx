@@ -11,16 +11,18 @@ import UserData from '../plugin/UserData'
 import { CartContext } from '../plugin/Context';
 import useAxios from '../../utils/useAxios'
 import { PAYPAL_CLIENT_ID } from '../../utils/constants';
+import { API_BASE_URL } from '../../utils/constants';
 
 // Renders errors or successful transactions on the screen.
 function Message({ content }) {
     return <p>{content}</p>;
 }
 
-
 function Checkout() {
     const params = useParams();
     const navigate = useNavigate();
+
+    const [paymentLoading, setPaymentLoading] = useState(false);
 
     const [coupon, setCoupon] = useState("");
 
@@ -97,6 +99,13 @@ function Checkout() {
         layout: "vertical",  // horizontal
     };
     const [message, setMessage] = useState("");
+
+    // https://dashboard.stripe.com/test/apikeys
+    // test: 4242 4242 4242 4242 cvv any 3 digit any future date
+    const payWithStripe = (event) => {
+        setPaymentLoading(true);
+        event.target.form.submit();
+    }
 
     return (
         <>
@@ -336,7 +345,27 @@ function Checkout() {
                                                 </PayPalScriptProvider>
                                                 <Message content={message} />
 
-                                                <Link to={`/success/txn_id/`} className="btn btn-lg btn-success mt-2"> Pay With Stripe</Link>
+                                                <form
+                                                    className='w-100'
+                                                    method="POST"
+                                                    action={`${API_BASE_URL}payment/stripe-checkout/${params.order_oid}/`}
+                                                >
+                                                    {
+                                                        paymentLoading === true ?
+                                                        <button
+                                                            disabled
+                                                            type='submit'
+                                                            className="btn btn-lg btn-success mt-2"
+                                                        > Processing <i className='fas fa-spinner fa-spin'></i></button>
+                                                        :
+                                                        <button
+                                                            onClick={payWithStripe}
+                                                            type='submit'
+                                                            className="btn btn-lg btn-success mt-2"
+                                                        > {" "} Pay With Stripe</button>
+                                                    }
+                                                </form>
+
                                             </div>
                                             <p className="small mb-0 mt-2 text-center">
                                                 By proceeding to payment, you agree to these{" "}<a href="#"> <strong>Terms of Service</strong></a>
