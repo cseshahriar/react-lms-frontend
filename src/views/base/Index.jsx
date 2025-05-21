@@ -13,12 +13,14 @@ import { useAuthStore } from "../../store/auth";
 import CartId from '../plugin/CartId';
 
 import { CartContext } from '../plugin/Context'
-import CategoryCarousel from './CategoryCarousel'
+import Rating from '../partials/Rating'
 
 function Index() {
     const navigate = useNavigate();
-
+    const [isInitialLoad, setIsInitialLoad] = useState(true);
     const [ratings, setRatings] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [activeCategory, setActiveCategory] = useState("All"); // default : Featured
 
     const allUserData = useAuthStore((state) => state.allUserData);
     const [user, setUser] = useState(null);
@@ -29,6 +31,7 @@ function Index() {
     const [cartCount, setCartCount] = useContext(CartContext);
     const cartId = CartId();
 
+    // fetch courses
     const fetchCourses = async (page = 1) => {
         try {
             setIsLoading(true);
@@ -38,37 +41,61 @@ function Index() {
             setCurrentPage(response.data.current_page);
         } catch (error) {
             console.log('Error fetching courses:', error);
+            Swal.fire({
+                title: "Error loading courses",
+                text: "Please try again later",
+                icon: "error"
+            });
         } finally {
             setIsLoading(false);
         }
     };
 
+    // fetch ratings
     const fetchRatings = async () => {
         try {
-            setIsLoading(true);
             await apiInstance.get(`course/reviews`).then((response) => {
-                console.log('ratings ', response.data);
                 setRatings(response.data);
             });
         } catch (error) {
-            console.log('Error fetching courses:', error);
-            setIsLoading(false);
+            console.log(error);
+        }
+    }
+
+    // fetch categories
+    const fetchCategories = async () => {
+        try {
+            await apiInstance.get(`course/category/`).then((response) => {
+                setCategories(response.data);
+            });
+        } catch (error) {
+            console.log(error);
         }
     }
 
     useEffect(() => {
-        fetchCourses();
-        fetchRatings();
-        if(allUserData) {
-            setUser(allUserData);
-            console.log('user', allUserData);
-        }
-    }, [cartCount, allUserData])
+        // setActiveCategory("All");
+        const fetchInitialData = async () => {
+            try {
+                setIsLoading(true);
+                await fetchCourses();
+                await fetchRatings();
+                await fetchCategories();
+
+                if (allUserData) {
+                    setUser(allUserData);
+                }
+            } catch(error) {
+                console.log(error);
+            }
+        };
+
+        fetchInitialData();
+    }, []); // Empty dependency array for initial load only
 
     const handlePageChange = (page) => {
         fetchCourses(page);
     };
-
 
     const addToCart = async (courseId, price, userId, country_name, cartId) => {
         console.log('add to cart called with:', { courseId, userId, price, country_name, cartId });
@@ -124,15 +151,42 @@ function Index() {
         navigate('/cart');
     }
 
-    const categories = [
-        "Featured", "Frontend", "Backend", "DevOps",
-        "AI/ML", "Cybersecurity", "Blockchain", "UI/UX",
-        "Data Science", "Mobile", "QA Testing", "Cloud"
-    ];
+    // categories
+    const handleCategory = async (title) => {
+        console.log('handleCategory 1', 'title', title, 'state', activeCategory);
+        setActiveCategory(title);
+        console.log('handleCategory 2', 'title', title, 'state', activeCategory);
+        try {
+            setIsLoading(true);
+            const response = await apiInstance.get(`course/course-list/?page=${1}&category_title=${title}`);
+            setCourses(response.data.results);
+            setTotalPages(response.data.total_pages);
+            setCurrentPage(response.data.current_page);
+        } catch (error) {
+            console.log('Error fetching courses:', error);
+            Swal.fire({
+                title: "Error loading courses",
+                text: "Please try again later",
+                icon: "error"
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    const itemsPerSlide = 3;
+    const chunkedCategories = [];
+    for (let i = 0; i < categories.length; i += itemsPerSlide) {
+        chunkedCategories.push(categories.slice(i, i + itemsPerSlide));
+    }
+    // Only show arrows if there are multiple slides
+    const shouldShowArrows = chunkedCategories.length > 1;
+    console.log('categories', categories);
 
     return (
         <>
             <BaseHeader />
+            {/** hero section */}
             <section className="py-lg-8 py-5 shadow-sm">
                 {/* container */}
                 <div className="container my-lg-8">
@@ -184,6 +238,7 @@ function Index() {
                 </div>
             </section>
 
+            {/** counter */}
             <section className="pb-8 shadow-sm">
                 <div className="container mb-lg-8">
                     {/* row */}
@@ -243,6 +298,7 @@ function Index() {
                 </div>
             </section>
 
+            {/** course */}
             <section className='mb-5'>
                 <div className="container mb-lg-8 ">
 
@@ -262,7 +318,77 @@ function Index() {
                     {/** Category slider */}
                     <div className="row py-3 mb-5">
                         <div className="col-md-12">
-                            <CategoryCarousel categories={categories} />
+                            <div
+                                id="category-carousel"
+                                className="carousel slide section-bg"
+                                data-bs-ride="false"
+                                data-bs-interval="false"
+                                style={{ background: "#e5e7eb", padding: "15px", borderRadius: "5px" }}
+                                >
+                                <div className="carousel-inner text-center">
+                                    {chunkedCategories.map((group, index) => (
+                                    <div
+                                        key={index}
+                                        className={`carousel-item ${index === 0 ? "active" : ""}`}
+                                    >
+                                        <div className="d-flex justify-content-center gap-3 flex-wrap">
+                                        <button
+                                            type="button"
+                                            className={`btn btn-lg px-5 ${
+                                                activeCategory === "All" ? "btn-dark" : "btn-light"
+                                            }`}
+                                            onClick={() => handleCategory("All")}
+                                        >
+                                            All
+                                        </button>
+                                        {group.map((category, i) => (
+                                            <button
+                                                key={i}
+                                                type="button"
+                                                className={`btn btn-lg px-5 ${
+                                                    activeCategory === category.title ? "btn-dark" : "btn-light"
+                                                }`}
+                                                onClick={() => handleCategory(category.title)}
+                                                data-title={category.title}
+                                            >
+                                                {category.title}
+                                            </button>
+                                        ))}
+                                        </div>
+                                    </div>
+                                    ))}
+                                </div>
+
+                                {/* Conditionally render arrows */}
+                                {shouldShowArrows && (
+                                    <>
+                                    <button
+                                        className="carousel-control-prev"
+                                        type="button"
+                                        data-bs-target="#category-carousel"
+                                        data-bs-slide="prev"
+                                    >
+                                        <span
+                                        className="carousel-control-prev-icon"
+                                        style={{ filter: "invert(100%) brightness(0)" }}
+                                        ></span>
+                                        <span className="visually-hidden">Previous</span>
+                                    </button>
+                                    <button
+                                        className="carousel-control-next"
+                                        type="button"
+                                        data-bs-target="#category-carousel"
+                                        data-bs-slide="next"
+                                    >
+                                        <span
+                                        className="carousel-control-next-icon"
+                                        style={{ filter: "invert(100%) brightness(0)" }}
+                                        ></span>
+                                        <span className="visually-hidden">Next</span>
+                                    </button>
+                                    </>
+                                )}
+                                </div>
                         </div>
                     </div>
 
@@ -270,112 +396,94 @@ function Index() {
                         <div className="col-md-12">
                             <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
                                 {
-                                    isLoading === true ? <p className='text-center py-3'>Loading <i className='fas fa-spinner fa-spin'></i></p> : ''
+                                    isLoading === true ?
+                                    <p className='text-center py-3' style={{fontSize: '50px'}}>Loading <i className='fas fa-spinner fa-spin'></i></p>
+                                    :
+                                     <>
+                                         {courses.map((course, course_index) => (
+                                             <div className="col" key={course_index}>
+                                                 <div className="card card-hover">
+                                                     <Link to={`/course-detail/${course.slug}/`}>
+                                                         <img
+                                                             src={course.image}
+                                                             alt={course.title}
+                                                             className="card-img-top"
+                                                             style={{ width: "100%", height: "200px", objectFit: "cover" }}
+                                                         />
+                                                     </Link>
+                                                     {/* Card Body */}
+                                                     <div className="card-body">
+                                                         <div className="d-flex justify-content-between align-items-center mb-3">
+                                                             <span className="badge bg-info">{course.level}</span>
+                                                             <a href="#" className="fs-5">
+                                                                 <i className="fas fa-heart text-danger align-middle" />
+                                                             </a>
+                                                         </div>
+                                                         <h4 className="mb-2 text-truncate-line-2 ">
+                                                             <Link to={`/course-detail/${course.slug}/`} className="text-inherit text-decoration-none text-dark fs-5">
+                                                                 {course.title}
+                                                             </Link>
+                                                         </h4>
+                                                         <small>By: {course.teacher?.full_name}</small> <br />
+                                                         <small>{course.students?.length || 0} Students</small> <br />
+                                                         <div className="lh-1 mt-3 d-flex">
+                                                             <span className="align-text-top">
+                                                                 <Rating total={5} rating={course.average_rating} />
+                                                             </span>
+                                                             <span className="fs-6 ms-2">({course.rating_count || 0})</span>
+                                                         </div>
+                                                     </div>
+                                                     {/* Card Footer */}
+                                                     <div className="card-footer">
+                                                         <div className="row align-items-center g-0">
+                                                             <div className="col">
+                                                                 <h5 className="mb-0">৳{course.price}</h5>
+                                                             </div>
+                                                             <div className="col-auto">
+                                                                 <button
+                                                                     type='button' className="btn-sm text-inherit text-decoration-none btn btn-primary me-2"
+                                                                     onClick={
+                                                                         () => addToCart(
+                                                                             course.id,
+                                                                             course.price,
+                                                                             user?.user_id || null,
+                                                                             user?.country || null,
+                                                                             CartId()
+                                                                         )
+                                                                     }
+                                                                 >
+                                                                     <i className="fas fa-shopping-cart text-primary text-white" />
+                                                                 </button>
+
+                                                                 <button
+                                                                     onClick={
+                                                                         () => enrolment(
+                                                                             course.id,
+                                                                             course.price,
+                                                                             user?.user_id || null,
+                                                                             user?.country || null,
+                                                                             CartId()
+                                                                         )
+                                                                     }
+                                                                     type='button'  className="btn-sm text-inherit text-decoration-none btn btn-primary">
+                                                                     Enroll Now <i className="fas fa-arrow-right text-primary align-middle me-2 text-white" />
+                                                                 </button>
+                                                             </div>
+                                                         </div>
+                                                     </div>
+                                                 </div>
+                                             </div>
+                                         ))}
+                                        {/** pagination */}
+                                        <Pagination
+                                            currentPage={currentPage}
+                                            totalPages={totalPages}
+                                            onPageChange={handlePageChange}
+                                        />
+                                        {courses?.length == 0 && <p>No course found!</p>}
+                                     </>
                                 }
 
-                                {courses.map((course, course_index) => (
-                                    <div className="col" key={course_index}>
-                                        <div className="card card-hover">
-                                            <Link to={`/course-detail/${course.slug}/`}>
-                                                <img
-                                                    src={course.image}
-                                                    alt={course.title}
-                                                    className="card-img-top"
-                                                    style={{ width: "100%", height: "200px", objectFit: "cover" }}
-                                                />
-                                            </Link>
-                                            {/* Card Body */}
-                                            <div className="card-body">
-                                                <div className="d-flex justify-content-between align-items-center mb-3">
-                                                    <span className="badge bg-info">{course.level}</span>
-                                                    <a href="#" className="fs-5">
-                                                        <i className="fas fa-heart text-danger align-middle" />
-                                                    </a>
-                                                </div>
-                                                <h4 className="mb-2 text-truncate-line-2 ">
-                                                    <Link to={`/course-detail/${course.slug}/`} className="text-inherit text-decoration-none text-dark fs-5">
-                                                        {course.title}
-                                                    </Link>
-                                                </h4>
-                                                <small>By: {course.teacher?.full_name}</small> <br />
-                                                <small>{course.students?.length || 0} Students</small> <br />
-                                                <div className="lh-1 mt-3 d-flex">
-                                                    <span className="align-text-top">
-                                                        <span className="fs-6">
-                                                            {/* Dynamic Star Rating */}
-                                                            {(() => {
-                                                                const rating = parseFloat(course.average_rating) || 0;
-                                                                const fullStars = Math.floor(rating);
-                                                                const hasHalfStar = rating % 1 >= 0.5;
-
-                                                                return (
-                                                                <>
-                                                                    {[...Array(fullStars)].map((_, i) => (
-                                                                        <i key={`full-${i}`} className="fas fa-star text-warning" />
-                                                                    ))}
-
-                                                                    {hasHalfStar && <i key="half" className="fas fa-star-half-alt text-warning" />}
-
-                                                                    {[...Array(5 - fullStars - (hasHalfStar ? 1 : 0))].map((_, i) => (
-                                                                        <i key={`empty-${i}`} className="far fa-star text-warning" />
-                                                                    ))}
-                                                                </>
-                                                                );
-                                                            })()}
-                                                        </span>
-                                                    </span>
-                                                    <span className="text-warning">{course.average_rating}</span>
-                                                    <span className="fs-6 ms-2">({course.rating_count || 0})</span>
-                                                </div>
-                                            </div>
-                                            {/* Card Footer */}
-                                            <div className="card-footer">
-                                                <div className="row align-items-center g-0">
-                                                    <div className="col">
-                                                        <h5 className="mb-0">৳{course.price}</h5>
-                                                    </div>
-                                                    <div className="col-auto">
-                                                        <button
-                                                            type='button' className="btn-sm text-inherit text-decoration-none btn btn-primary me-2"
-                                                            onClick={
-                                                                () => addToCart(
-                                                                    course.id,
-                                                                    course.price,
-                                                                    user?.user_id || null,
-                                                                    user?.country || null,
-                                                                    CartId()
-                                                                )
-                                                            }
-                                                        >
-                                                            <i className="fas fa-shopping-cart text-primary text-white" />
-                                                        </button>
-
-                                                        <button
-                                                            onClick={
-                                                                () => enrolment(
-                                                                    course.id,
-                                                                    course.price,
-                                                                    user?.user_id || null,
-                                                                    user?.country || null,
-                                                                    CartId()
-                                                                )
-                                                            }
-                                                            type='button'  className="btn-sm text-inherit text-decoration-none btn btn-primary">
-                                                            Enroll Now <i className="fas fa-arrow-right text-primary align-middle me-2 text-white" />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-
-                                {/** pagination */}
-                                <Pagination
-                                    currentPage={currentPage}
-                                    totalPages={totalPages}
-                                    onPageChange={handlePageChange}
-                                />
                             </div>
                         </div>
                     </div>
@@ -437,13 +545,7 @@ function Index() {
                                     <div>
                                         <div className="mb-3">
                                             <span className="lh-1">
-                                                <span className="align-text-top ms-2">
-                                                    <i className='fas fa-star text-warning'></i>
-                                                    <i className='fas fa-star text-warning'></i>
-                                                    <i className='fas fa-star text-warning'></i>
-                                                    <i className='fas fa-star text-warning'></i>
-                                                    <i className='fas fa-star text-warning'></i>
-                                                </span>
+                                                <Rating total={5} rating={4.5} />
                                                 <span className="text-dark fw-semibold">4.5/5.0</span>
                                             </span>
                                             <span className="ms-2">(Based on 3265 ratings)</span>
@@ -470,7 +572,7 @@ function Index() {
                         </div>
                     </div>
 
-                    {/* row */}
+                    {/* review */}
                     <div className="row">
                         {/* col */}
                         <div className="col-md-12">
@@ -498,62 +600,11 @@ function Index() {
                                                             {/* rating */}
                                                             <div className="lh-1 mb-3 mt-4">
                                                                 <span className="fs-6 align-top">
-                                                                    <svg
-                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                        width={11}
-                                                                        height={11}
-                                                                        fill="currentColor"
-                                                                        className="bi bi-star-fill text-warning"
-                                                                        viewBox="0 0 16 16"
-                                                                    >
-                                                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                    </svg>
-                                                                    <svg
-                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                        width={11}
-                                                                        height={11}
-                                                                        fill="currentColor"
-                                                                        className="bi bi-star-fill text-warning"
-                                                                        viewBox="0 0 16 16"
-                                                                    >
-                                                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                    </svg>
-                                                                    <svg
-                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                        width={11}
-                                                                        height={11}
-                                                                        fill="currentColor"
-                                                                        className="bi bi-star-fill text-warning"
-                                                                        viewBox="0 0 16 16"
-                                                                    >
-                                                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                    </svg>
-                                                                    <svg
-                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                        width={11}
-                                                                        height={11}
-                                                                        fill="currentColor"
-                                                                        className="bi bi-star-fill text-warning"
-                                                                        viewBox="0 0 16 16"
-                                                                    >
-                                                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                    </svg>
-                                                                    <svg
-                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                        width={11}
-                                                                        height={11}
-                                                                        fill="currentColor"
-                                                                        className="bi bi-star-fill text-warning"
-                                                                        viewBox="0 0 16 16"
-                                                                    >
-                                                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                    </svg>
+                                                                   <Rating total={5} rating={rating.rating} />
                                                                 </span>
-                                                                <span className="text-warning">{rating?.rating || 0}</span>
                                                                 {/* text */}
                                                             </div>
-                                                            <h3 className="mb-0 h4">{rating?.profile?.full_name}</h3>
-                                                            <span>{rating?.profile.about}</span>
+                                                            <span>{rating?.profile?.about}</span>
                                                         </div>
                                                     </div>
                                                 </div>

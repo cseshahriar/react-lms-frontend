@@ -12,6 +12,8 @@ import Toast from '../plugin/Toast'
 import { CartContext } from '../plugin/Context'
 import apiInstance from '../../utils/axios'
 
+import Rating from '../partials/Rating'
+
 function CourseDetail() {
     const navigate = useNavigate();
     const params = useParams();
@@ -115,8 +117,11 @@ function CourseDetail() {
                                     {/* Content */}
                                     <ul className="list-inline mb-0">
                                         <li className="list-inline-item h6 me-3 mb-1 mb-sm-0">
-                                            <i className="fas fa-star text-warning me-2" />
-                                            {course.average_rating || 0}/5
+                                            <span className="align-text-top">
+                                            <Rating total={5} rating={course.average_rating} />
+                                            </span>
+                                            <span className="fs-6 ms-2">({course.rating_count || 0})</span>
+
                                         </li>
                                         <li className="list-inline-item h6 me-3 mb-1 mb-sm-0">
                                             <i className="fas fa-user-graduate text-orange me-2" />
@@ -874,6 +879,7 @@ function CourseDetail() {
                                                 </div>
                                             </div>
                                             {/* Video END */}
+
                                             {/* Course info START */}
                                             <div className="card card-body shadow p-4 mb-4">
                                                 {/* Title */}
@@ -934,6 +940,7 @@ function CourseDetail() {
                             {/* Row END */}
                         </div>
                     </section>
+
 
                     {/** Related Courses  */}
                     <section className='mb-5'>
