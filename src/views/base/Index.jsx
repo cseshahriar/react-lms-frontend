@@ -18,6 +18,8 @@ import CategoryCarousel from './CategoryCarousel'
 function Index() {
     const navigate = useNavigate();
 
+    const [ratings, setRatings] = useState([]);
+
     const allUserData = useAuthStore((state) => state.allUserData);
     const [user, setUser] = useState(null);
     const [courses, setCourses] = useState([]);
@@ -41,8 +43,22 @@ function Index() {
         }
     };
 
+    const fetchRatings = async () => {
+        try {
+            setIsLoading(true);
+            await apiInstance.get(`course/reviews`).then((response) => {
+                console.log('ratings ', response.data);
+                setRatings(response.data);
+            });
+        } catch (error) {
+            console.log('Error fetching courses:', error);
+            setIsLoading(false);
+        }
+    }
+
     useEffect(() => {
         fetchCourses();
+        fetchRatings();
         if(allUserData) {
             setUser(allUserData);
             console.log('user', allUserData);
@@ -414,6 +430,7 @@ function Index() {
                     <div className="row mb-lg-8 mb-5">
                         <div className="offset-lg-1 col-lg-10 col-12">
                             <div className="row align-items-center">
+
                                 {/* col */}
                                 <div className="col-lg-6 col-md-8">
                                     {/* rating */}
@@ -452,6 +469,7 @@ function Index() {
                             </div>
                         </div>
                     </div>
+
                     {/* row */}
                     <div className="row">
                         {/* col */}
@@ -462,240 +480,85 @@ function Index() {
                                 <div className="sliderTestimonial">
                                     {/* item */}
                                     <div className="row">
-                                        <div className="col-lg-4">
-                                            <div className="item">
-                                                <div className="card">
-                                                    <div className="card-body text-center p-6">
-                                                        {/* img */}
-                                                        <img
-                                                            src="../../assets/images/avatar/avatar-1.jpg"
-                                                            alt="avatar"
-                                                            className="avatar avatar-lg rounded-circle"
-                                                        />
-                                                        <p className="mb-0 mt-3">
-                                                            “The generated lorem Ipsum is therefore always free from
-                                                            repetition, injected humour, or words etc generate lorem
-                                                            Ipsum which looks racteristic reasonable.”
-                                                        </p>
-                                                        {/* rating */}
-                                                        <div className="lh-1 mb-3 mt-4">
-                                                            <span className="fs-6 align-top">
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                            </span>
-                                                            <span className="text-warning">5</span>
-                                                            {/* text */}
+                                        { ratings?.map((rating, index) => (
+                                            <div className="col-lg-4" key={index}>
+                                                <div className="item">
+                                                    <div className="card">
+                                                        <div className="card-body text-center p-6">
+                                                            {/* img */}
+                                                            <img
+                                                                src={rating.profile?.image}
+                                                                alt="avatar"
+                                                                className="avatar avatar-lg rounded-circle"
+                                                                style={{width:"80px"}}
+                                                            />
+                                                            <p className="mb-0 mt-3">
+                                                                “{rating.review}”
+                                                            </p>
+                                                            {/* rating */}
+                                                            <div className="lh-1 mb-3 mt-4">
+                                                                <span className="fs-6 align-top">
+                                                                    <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        width={11}
+                                                                        height={11}
+                                                                        fill="currentColor"
+                                                                        className="bi bi-star-fill text-warning"
+                                                                        viewBox="0 0 16 16"
+                                                                    >
+                                                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
+                                                                    </svg>
+                                                                    <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        width={11}
+                                                                        height={11}
+                                                                        fill="currentColor"
+                                                                        className="bi bi-star-fill text-warning"
+                                                                        viewBox="0 0 16 16"
+                                                                    >
+                                                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
+                                                                    </svg>
+                                                                    <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        width={11}
+                                                                        height={11}
+                                                                        fill="currentColor"
+                                                                        className="bi bi-star-fill text-warning"
+                                                                        viewBox="0 0 16 16"
+                                                                    >
+                                                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
+                                                                    </svg>
+                                                                    <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        width={11}
+                                                                        height={11}
+                                                                        fill="currentColor"
+                                                                        className="bi bi-star-fill text-warning"
+                                                                        viewBox="0 0 16 16"
+                                                                    >
+                                                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
+                                                                    </svg>
+                                                                    <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        width={11}
+                                                                        height={11}
+                                                                        fill="currentColor"
+                                                                        className="bi bi-star-fill text-warning"
+                                                                        viewBox="0 0 16 16"
+                                                                    >
+                                                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
+                                                                    </svg>
+                                                                </span>
+                                                                <span className="text-warning">{rating?.rating || 0}</span>
+                                                                {/* text */}
+                                                            </div>
+                                                            <h3 className="mb-0 h4">{rating?.profile?.full_name}</h3>
+                                                            <span>{rating?.profile.about}</span>
                                                         </div>
-                                                        <h3 className="mb-0 h4">Gladys Colbert</h3>
-                                                        <span>Software Engineer at Palantir</span>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div className="col-lg-4">
-                                            <div className="item">
-                                                <div className="card">
-                                                    <div className="card-body text-center p-6">
-                                                        {/* img */}
-                                                        <img
-                                                            src="../../assets/images/avatar/avatar-1.jpg"
-                                                            alt="avatar"
-                                                            className="avatar avatar-lg rounded-circle"
-                                                        />
-                                                        <p className="mb-0 mt-3">
-                                                            “The generated lorem Ipsum is therefore always free from
-                                                            repetition, injected humour, or words etc generate lorem
-                                                            Ipsum which looks racteristic reasonable.”
-                                                        </p>
-                                                        {/* rating */}
-                                                        <div className="lh-1 mb-3 mt-4">
-                                                            <span className="fs-6 align-top">
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                            </span>
-                                                            <span className="text-warning">5</span>
-                                                            {/* text */}
-                                                        </div>
-                                                        <h3 className="mb-0 h4">Gladys Colbert</h3>
-                                                        <span>Software Engineer at Palantir</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="col-lg-4">
-                                            <div className="item">
-                                                <div className="card">
-                                                    <div className="card-body text-center p-6">
-                                                        {/* img */}
-                                                        <img
-                                                            src="../../assets/images/avatar/avatar-1.jpg"
-                                                            alt="avatar"
-                                                            className="avatar avatar-lg rounded-circle"
-                                                        />
-                                                        <p className="mb-0 mt-3">
-                                                            “The generated lorem Ipsum is therefore always free from
-                                                            repetition, injected humour, or words etc generate lorem
-                                                            Ipsum which looks racteristic reasonable.”
-                                                        </p>
-                                                        {/* rating */}
-                                                        <div className="lh-1 mb-3 mt-4">
-                                                            <span className="fs-6 align-top">
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                            </span>
-                                                            <span className="text-warning">5</span>
-                                                            {/* text */}
-                                                        </div>
-                                                        <h3 className="mb-0 h4">Gladys Colbert</h3>
-                                                        <span>Software Engineer at Palantir</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        ))}
                                     </div>
                                 </div>
                             </div>
