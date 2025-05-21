@@ -22,8 +22,7 @@ function Search() {
     const [user, setUser] = useState(null);
     const [courses, setCourses] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
+
     const [cartCount, setCartCount] = useContext(CartContext);
     const cartId = CartId();
 
@@ -124,6 +123,19 @@ function Search() {
     }
   }
 
+  // pagination
+  const itemsPerPage = 1
+  const [currentPage, setCurrentPage] = useState(1);
+  const indexOfLastItem = currentPage * itemsPerPage
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage
+  const currentItems = courses.slice(indexOfFirstItem, indexOfLastItem)
+  const totalPages = Math.ceil(courses.length / itemsPerPage)
+  const pageNumbers = Array.from(
+    {length: totalPages},
+    (_, index) => index + 1
+  )
+
+
   return (
     <>
       <BaseHeader />
@@ -155,7 +167,7 @@ function Search() {
           <div className="row">
             <div className="col-md-12">
               <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-                {courses.map((course, course_index) => (
+                {currentItems.map((course, course_index) => (
                 <div className="col" key={course_index}>
                       <div className="card card-hover">
                           <Link to={`/course-detail/${course.slug}/`}>
@@ -250,15 +262,49 @@ function Search() {
                           </div>
                       </div>
                   </div>
-              ))}
-
+                ))}
               </div>
 
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
+              {/** pagination */}
+              <nav className="d-flex mt-5">
+                <ul className="pagination">
+                      <li className="page-item">
+                        <p className="me-3" disabled style={{border: '0 !important', padding: '5px', fontWeight: "700"}}>
+                          {courses.length || 0} Courses
+                        </p>
+                      </li>
+                </ul>
+
+                <ul className="pagination">
+                  <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                    <button className="page-link me-1" onClick={() => setCurrentPage(currentPage - 1)}>
+                      <i className="ci-arrow-left me-2" />
+                      Previous
+                    </button>
+                  </li>
+                </ul>
+
+                <ul className="pagination">
+                  {
+                    pageNumbers.map((number) => (
+                      <li key={number} className={`page-item ${currentPage === number ? 'active' : ''} `}>
+                        <button className="page-link" onClick={() => setCurrentPage(number)}>{number}</button>
+                      </li>
+                    ))
+                  }
+                </ul>
+
+                <ul className="pagination">
+                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                    <button className="page-link ms-1" onClick={() => setCurrentPage(currentPage + 1)}>
+                      Next
+                      <i className="ci-arrow-right ms-3" />
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+
+
             </div>
           </div>
         </div>
