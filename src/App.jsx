@@ -45,9 +45,9 @@ import CourseCreate from "./views/instructor/CourseCreate";
 import CourseEdit from "./views/instructor/CourseEdit";
 import CourseEditCurriculum from "./views/instructor/CourseEditCurriculum";
 
+import NotFoundPage from './views/partials/NotFoundPage';
 
 import { setUser } from './utils/auth';
-
 import apiInstance from './utils/axios';
 import CartId from './views/plugin/CartId';
 
@@ -146,7 +146,6 @@ function App() {
                 />
 
                 {/* Teacher Routes */}
-
                 <Route
                     path="/instructor/dashboard/"
                     element={
@@ -267,6 +266,8 @@ function App() {
                         </PrivateRoute>
                     }
                 />
+
+                <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </MainWrapper>
           </BrowserRouter>
