@@ -66,7 +66,7 @@ function App() {
         setCartCount(response.data?.length);
       });
 
-    useAxios().get(`user/profile/${UserData()?.user_id}/`).then((res) => {
+    useAxios.get(`user/profile/${UserData()?.user_id}/`).then((res) => {
         setProfile(res.data);
     });
   }, []);

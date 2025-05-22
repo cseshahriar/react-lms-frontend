@@ -21,7 +21,7 @@ function Profile() {
   const [imagePreview, setImagePreview] = useState("");
 
   const fetchProfile = () => {
-    useAxios().get(`user/profile/${UserData()?.user_id}/`).then((response) => {
+    useAxios.get(`user/profile/${UserData()?.user_id}/`).then((response) => {
       console.log(response.data);
       setProfile(response.data);
       setProfileData(response.data);
@@ -62,7 +62,7 @@ function Profile() {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await useAxios().get(`user/profile/${UserData()?.user_id}/`);
+    const response = await useAxios.get(`user/profile/${UserData()?.user_id}/`);
 
     const formData = new FormData();
     formData.append("full_name", profileData.full_name);
@@ -72,7 +72,7 @@ function Profile() {
       formData.append("image", profileData.image);
     }
 
-    await useAxios().patch(`user/profile/${UserData()?.user_id}/`, formData, {
+    await useAxios.patch(`user/profile/${UserData()?.user_id}/`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       }

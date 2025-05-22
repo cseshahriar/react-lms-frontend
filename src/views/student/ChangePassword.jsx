@@ -39,7 +39,7 @@ function ChangePassword() {
         formdata.append("new_password", changePasswordData.new_password);
 
         try {
-            await useAxios().post(`user/change-password/`, formdata).then((res) => {
+            await useAxios.post(`user/change-password/`, formdata).then((res) => {
                 console.log(res.data);
                 Toast().fire({
                     icon: res.data.icon,

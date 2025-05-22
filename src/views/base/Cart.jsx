@@ -86,7 +86,7 @@ function Cart() {
         console.log('form data: ', formData);
 
         try {
-            await useAxios().post(`order/create-order/`, formData)
+            await useAxios.post(`order/create-order/`, formData)
                 .then((response) => {
                     console.log('create order', response.data);
                     navigate(`/checkout/${response.data.order_oid}`);

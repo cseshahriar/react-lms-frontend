@@ -68,7 +68,7 @@ function Sidebar() {
                                 </Link>
                             </li>
                             <li className="nav-item">
-                                <Link className="nav-link" to={`/login/`}>
+                                <Link className="nav-link" to={`/logout`}>
                                     {" "}
                                     <i className="fas fa-sign-out-alt"></i> Sign Out
                                 </Link>

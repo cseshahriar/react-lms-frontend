@@ -24,7 +24,7 @@ function Success() {
             formData.append('paypal_order_id', paypalOrderId)
             setOrderMessage("Processing Payment");
             try {
-                await useAxios().post(`payment/payment-success/`, formData).then((response) => {
+                await useAxios.post(`payment/payment-success/`, formData).then((response) => {
                     console.log(response.data);
                     setOrderMessage(response.data.message);
                 })

@@ -36,7 +36,7 @@ function Checkout() {
 
     const fetchOrder = async() => {
         try {
-            await useAxios().get(`order/checkout/${params.order_oid}`)
+            await useAxios.get(`order/checkout/${params.order_oid}`)
                 .then((response) => {
                     setOrder(response.data);
                 });
@@ -56,7 +56,7 @@ function Checkout() {
 
         if(coupon && order.oid) {
             try {
-                 await useAxios().post(`order/coupon/`, forData)
+                 await useAxios.post(`order/coupon/`, forData)
                 .then((response) => {
                     fetchOrder();
                     Toast().fire({
