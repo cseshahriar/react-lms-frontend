@@ -18,3 +18,7 @@ yarn add axios js-cookie jwt-decode moment react-bootstrap react-chartjs-2 react
 @paypal/react-paypal-js
 
 yarn add  prettier --dev
+
+
+# Todo:
+-- cart clear after payment

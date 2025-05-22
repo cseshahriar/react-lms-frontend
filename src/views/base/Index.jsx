@@ -416,7 +416,7 @@ function Index() {
                                                          <div className="d-flex justify-content-between align-items-center mb-3">
                                                              <span className="badge bg-info">{course.level}</span>
                                                              <a href="#" className="fs-5">
-                                                                 <i className="fas fa-heart text-danger align-middle" />
+                                                                 <i className="fas fa-heart text-dark align-middle" /> {/** if user wishlist then text-danger */}
                                                              </a>
                                                          </div>
                                                          <h4 className="mb-2 text-truncate-line-2 ">
