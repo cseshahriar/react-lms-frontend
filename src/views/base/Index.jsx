@@ -2,18 +2,24 @@ import {useState, useEffect, useContext } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import moment from 'moment'
 import Swal from 'sweetalert2'
-import Rater from 'react-rater';
 
 import BaseHeader from '../partials/BaseHeader'
 import BaseFooter from '../partials/BaseFooter'
 import Pagination from '../partials/Pagination'
 
-import apiInstance from '../../utils/axios'
 import { useAuthStore } from "../../store/auth";
-import CartId from '../plugin/CartId';
-
-import { CartContext } from '../plugin/Context'
 import Rating from '../partials/Rating'
+import Rater from "react-rater";
+import "react-rater/lib/react-rater.css";
+
+import useAxios from "../../utils/useAxios";
+import CartId from "../plugin/CartId";
+import GetCurrentAddress from "../plugin/UserCountry";
+import UserData from "../plugin/UserData";
+import Toast from "../plugin/Toast";
+import { CartContext } from "../plugin/Context";
+
+import apiInstance from "../../utils/axios";
 
 function Index() {
     const navigate = useNavigate();
@@ -26,10 +32,13 @@ function Index() {
     const [user, setUser] = useState(null);
     const [courses, setCourses] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
+
+
     const [cartCount, setCartCount] = useContext(CartContext);
     const cartId = CartId();
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
     // fetch courses
     const fetchCourses = async (page = 1) => {
@@ -181,7 +190,21 @@ function Index() {
     }
     // Only show arrows if there are multiple slides
     const shouldShowArrows = chunkedCategories.length > 1;
-    console.log('categories', categories);
+
+    const addToWishlist = (courseId) => {
+        const formdata = new FormData();
+        formdata.append("user_id", UserData()?.user_id);
+        formdata.append("course_id", courseId);
+
+        apiInstance.post(`student/wishlist/${UserData()?.user_id}/`, formdata).then((res) => {
+            console.log(res.data);
+            Toast().fire({
+                icon: "success",
+                title: res.data.message,
+            });
+        });
+    };
+
 
     return (
         <>
@@ -414,21 +437,30 @@ function Index() {
                                                      {/* Card Body */}
                                                      <div className="card-body">
                                                          <div className="d-flex justify-content-between align-items-center mb-3">
-                                                             <span className="badge bg-info">{course.level}</span>
-                                                             <a href="#" className="fs-5">
-                                                                 <i className="fas fa-heart text-dark align-middle" /> {/** if user wishlist then text-danger */}
-                                                             </a>
+                                                             <div>
+                                                                <span className="badge bg-info">{course.level}</span>
+                                                                <span className="badge bg-success ms-2">{course.language}</span>
+                                                             </div>
+                                                             {/** make read hert if whishlist exist elese dart */}
+                                                            <a onClick={() => addToWishlist(course.id)} className="fs-5">
+                                                                 <i className="fas fa-heart text-danger align-middle" />
+                                                            </a>
                                                          </div>
+
                                                          <h4 className="mb-2 text-truncate-line-2 ">
                                                              <Link to={`/course-detail/${course.slug}/`} className="text-inherit text-decoration-none text-dark fs-5">
                                                                  {course.title}
                                                              </Link>
                                                          </h4>
                                                          <small>By: {course.teacher?.full_name}</small> <br />
-                                                         <small>{course.students?.length || 0} Students</small> <br />
+                                                          <small>
+                                                            {course.students?.length} Student
+                                                            {course.students?.length > 1 && "s"}
+                                                        </small>{" "}
+
                                                          <div className="lh-1 mt-3 d-flex">
                                                              <span className="align-text-top">
-                                                                 <Rating total={5} rating={course.average_rating} />
+                                                                <Rater total={5} rating={course.average_rating || 0} />
                                                              </span>
                                                              <span className="fs-6 ms-2">({course.rating_count || 0})</span>
                                                          </div>
@@ -481,9 +513,8 @@ function Index() {
                                             onPageChange={handlePageChange}
                                         />
                                         {courses?.length == 0 && <p>No course found!</p>}
-                                     </>
+                                        </>
                                 }
-
                             </div>
                         </div>
                     </div>
