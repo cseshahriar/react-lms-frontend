@@ -57,7 +57,7 @@ function Courses() {
                                 <i className="fas fa-shopping-cart"></i> My Courses
                             </h4>
 
-                            {fetching === true && <p className="mt-3 p-3">Loading...</p>}
+                            {fetching === true && <p className="mt-3 p-3" style={{fontSize: '50px'}}>Loading <i className='fas fa-spinner fa-spin'></i></p>}
 
                             {fetching === false && (
                                 <div className="card mb-4">
@@ -126,26 +126,28 @@ function Courses() {
                                                         <td>
                                                             <p className="mt-3">{moment(c.date).format("D MMM, YYYY")}</p>
                                                         </td>
-                                                        <td>
+                                                        <td className="text-center">
                                                             <p className="mt-3">{c.lectures?.length}</p>
                                                         </td>
-                                                        <td>
+                                                        <td className="text-center">
                                                             <p className="mt-3">{c.completed_lesson?.length}</p>
                                                         </td>
                                                         <td>
+                                                                                                         <td>
                                                             {c.completed_lesson?.length < 1 && (
-                                                                <button className="btn btn-success btn-sm mt-3">
-                                                                    start Course
+                                                                <Link to={`/student/courses/${c.enrollment_id}/`} className="btn btn-success btn-sm mt-3">
+                                                                    Start Course
                                                                     <i className="fas fa-arrow-right ms-2"></i>
-                                                                </button>
+                                                                </Link>
                                                             )}
 
                                                             {c.completed_lesson?.length > 0 && (
-                                                                <button className="btn btn-primary btn-sm mt-3">
+                                                                <Link to={`/student/courses/${c.enrollment_id}/`} className="btn btn-primary btn-sm mt-3">
                                                                     Continue Course
                                                                     <i className="fas fa-arrow-right ms-2"></i>
-                                                                </button>
+                                                                </Link>
                                                             )}
+                                                        </td>
                                                         </td>
                                                     </tr>
                                                 ))}

@@ -110,7 +110,7 @@ function Dashboard() {
                                 </div>
                             </div>
 
-                            {fetching === true && <p className="mt-3 p-3">Loading...</p>}
+                            {fetching === true && <p className="mt-3 p-3" style={{fontSize: '50px'}}>Loading <i className='fas fa-spinner fa-spin'></i></p>}
 
                             {fetching === false && (
                                 <div className="card mb-4">
