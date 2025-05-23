@@ -19,6 +19,9 @@ function CourseDetail() {
   const [course, setCourse] = useState([]);
 
   // play lecture modal
+  const [completionPercentage, setCompletionPercentage] = useState(1);
+  const [markAsCompletedStatus, setMarkAsCompletedStatus] = useState([]);
+
   const [currentLecture, setCurrentLecture] = useState(null);
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
@@ -26,7 +29,6 @@ function CourseDetail() {
     setShow(true);
     setCurrentLecture(lecture);
   }
-
 
   const [noteShow, setNoteShow] = useState(false);
   const handleNoteClose = () => setNoteShow(false);
@@ -45,6 +47,9 @@ function CourseDetail() {
           console.log(response.data);
           setCourse(response.data);
           setFetching(false);
+
+          const percentageCompleted = (response.data?.completed_lesson?.length / response.data?.lectures?.length) * 100;
+          setCompletionPercentage(percentageCompleted?.toFixed(2));
         });
       } catch (error) {
         console.log(error);
@@ -55,6 +60,27 @@ function CourseDetail() {
   useEffect(() => {
       fetchData();
   }, [])
+
+  const handleMarkLessonAsCompleted = (variantItemId) => {
+    const key = `lecture_${variantItemId}`;
+    setMarkAsCompletedStatus({
+      ...markAsCompletedStatus,
+      [key]: "Updating"
+    })
+
+    const formData = new FormData();
+    formData.append("user_id", UserData()?.user_id);
+    formData.append("course_id", course?.course?.id);
+    formData.append("variant_item_id", variantItemId);
+
+    useAxios.post(`student/course-completed/`, formData).then((response) => {
+      fetchData();
+      setMarkAsCompletedStatus({
+        ...markAsCompletedStatus,
+        [key]: "Updated"
+      })
+    })
+  }
 
   return (
     <>
@@ -162,17 +188,21 @@ function CourseDetail() {
 
                                 <div className="progress mb-3">
                                   <div
-                                    className="progress-bar"
-                                    role="progressbar"
-                                    style={{ width: `${25}%` }}
-                                    aria-valuenow={25}
-                                    aria-valuemin={0}
-                                    aria-valuemax={100}
-                                  >
-                                    25%
+                                      className={`progress-bar
+                                        ${completionPercentage < 50 ? 'bg-warning text-dark' :
+                                          completionPercentage < 74 ? 'bg-primary' :
+                                          completionPercentage > 75 ? 'bg-success' :
+                                          ''}`
+                                      }
+                                      role="progressbar"
+                                      style={{ width: `${completionPercentage}%` }}
+                                      aria-valuenow={completionPercentage}
+                                      aria-valuemin={0}
+                                      aria-valuemax={100}
+                                    >
+                                      {completionPercentage} %
                                   </div>
                                 </div>
-
 
                                 {
                                   course?.curriculum?.map((section, index) => (
@@ -228,7 +258,14 @@ function CourseDetail() {
                                                 </div>
                                                 <div className='d-flex gap-1'>
                                                   <p className="mb-0">{lecture.content_duration || "0m 0s"}</p>
-                                                  <input type="checkbox" className='form-check-input' name="" id="" />
+                                                  <input
+                                                    onChange={() => handleMarkLessonAsCompleted(lecture.variant_item_id)}
+                                                    type="checkbox"
+                                                    className='form-check-input'
+                                                    name=""
+                                                    id=""
+                                                    checked={course.completed_lesson?.some((cl) => cl.variant_item.id === lecture.id)}
+                                                  />
                                                 </div>
                                               </div>
                                               <hr />
