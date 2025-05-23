@@ -98,7 +98,20 @@ function CourseDetail() {
         navigate('/cart');
     }
 
-    console.log('course ', course);
+    const addToWishlist = (courseId) => {
+        const formdata = new FormData();
+        formdata.append("user_id", UserData()?.user_id);
+        formdata.append("course_id", courseId);
+
+        apiInstance.post(`student/wishlist/${UserData()?.user_id}/`, formdata).then((res) => {
+            console.log(res.data);
+            Toast().fire({
+                icon: "success",
+                title: res.data.message,
+            });
+        });
+    };
+
     return (
         <>
             <BaseHeader />

@@ -11,7 +11,7 @@ import useAxios from "../../utils/useAxios";
 import UserData from "../plugin/UserData";
 
 function Dashboard() {
-    const [courses, setCourses] = useState([]);
+    const [enrolledCourses, setCourses] = useState([]);
     const [stats, setStats] = useState([]);
     const [fetching, setFetching] = useState(true);
 
@@ -38,7 +38,7 @@ function Dashboard() {
         if (query === "") {
             fetchData();
         } else {
-            const filtered = courses.filter((c) => {
+            const filtered = enrolledCourses.filter((c) => {
                 return c.course.title.toLowerCase().includes(query);
             });
             setCourses(filtered);
@@ -78,6 +78,7 @@ function Dashboard() {
                                         </div>
                                     </div>
                                 </div>
+
                                 {/* Counter item */}
                                 <div className="col-sm-6 col-lg-4 mb-3 mb-lg-0">
                                     <div className="d-flex justify-content-center align-items-center p-4 bg-danger bg-opacity-10 rounded-3">
@@ -92,6 +93,7 @@ function Dashboard() {
                                         </div>
                                     </div>
                                 </div>
+
                                 {/* Counter item */}
                                 <div className="col-sm-6 col-lg-4 mb-3 mb-lg-0">
                                     <div className="d-flex justify-content-center align-items-center p-4 bg-success bg-opacity-10 rounded-3">
@@ -116,6 +118,7 @@ function Dashboard() {
                                         <h3 className="mb-0">Courses</h3>
                                         <span>Start watching courses now from your dashboard page.</span>
                                     </div>
+
                                     <div className="card-body">
                                         <form className="row gx-3">
                                             <div className="col-lg-12 col-md-12 col-12 mb-lg-0 mb-2">
@@ -123,6 +126,7 @@ function Dashboard() {
                                             </div>
                                         </form>
                                     </div>
+
                                     <div className="table-responsive overflow-y-hidden">
                                         <table className="table mb-0 text-nowrap table-hover table-centered text-nowrap">
                                             <thead className="table-light">
@@ -136,14 +140,14 @@ function Dashboard() {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {courses?.map((c, index) => (
+                                                {enrolledCourses?.map((enrollment, index) => (
                                                     <tr key={index}>
                                                         <td>
                                                             <div className="d-flex align-items-center">
                                                                 <div>
                                                                     <a href="#">
                                                                         <img
-                                                                            src={c.course.image}
+                                                                            src={enrollment.course.image}
                                                                             alt="course"
                                                                             className="rounded img-4by3-lg"
                                                                             style={{
@@ -158,41 +162,41 @@ function Dashboard() {
                                                                 <div className="ms-3">
                                                                     <h4 className="mb-1 h5">
                                                                         <a href="#" className="text-inherit text-decoration-none text-dark">
-                                                                            {c.course.title}
+                                                                            {enrollment.course.title}
                                                                         </a>
                                                                     </h4>
                                                                     <ul className="list-inline fs-6 mb-0">
                                                                         <li className="list-inline-item">
                                                                             <i className="fas fa-user"></i>
-                                                                            <span className="ms-1">{c.course.language}</span>
+                                                                            <span className="ms-1">{enrollment.course.language}</span>
                                                                         </li>
                                                                         <li className="list-inline-item">
                                                                             <i className="bi bi-reception-4"></i>
-                                                                            <span className="ms-1"> {c.course.level}</span>
+                                                                            <span className="ms-1"> {enrollment.course.level}</span>
                                                                         </li>
                                                                     </ul>
                                                                 </div>
                                                             </div>
                                                         </td>
                                                         <td>
-                                                            <p className="mt-3">{moment(c.date).format("D MMM, YYYY")}</p>
+                                                            <p className="mt-3">{moment(enrollment.date).format("D MMM, YYYY")}</p>
+                                                        </td>
+                                                        <td className='text-center'>
+                                                            <p className="mt-3">{enrollment.lectures?.length}</p>
+                                                        </td>
+                                                        <td className='text-center'>
+                                                            <p className="mt-3">{enrollment.completed_lesson?.length}</p>
                                                         </td>
                                                         <td>
-                                                            <p className="mt-3">{c.lectures?.length}</p>
-                                                        </td>
-                                                        <td>
-                                                            <p className="mt-3">{c.completed_lesson?.length}</p>
-                                                        </td>
-                                                        <td>
-                                                            {c.completed_lesson?.length < 1 && (
-                                                                <Link to={`/student/courses/${c.enrollment_id}/`} className="btn btn-success btn-sm mt-3">
-                                                                    start Course
+                                                            {enrollment.completed_lesson?.length < 1 && (
+                                                                <Link to={`/student/courses/${enrollment.enrollment_id}/`} className="btn btn-success btn-sm mt-3">
+                                                                    Start Course
                                                                     <i className="fas fa-arrow-right ms-2"></i>
                                                                 </Link>
                                                             )}
 
-                                                            {c.completed_lesson?.length > 0 && (
-                                                                <Link to={`/student/courses/${c.enrollment_id}/`} className="btn btn-primary btn-sm mt-3">
+                                                            {enrollment.completed_lesson?.length > 0 && (
+                                                                <Link to={`/student/courses/${enrollment.enrollment_id}/`} className="btn btn-primary btn-sm mt-3">
                                                                     Continue Course
                                                                     <i className="fas fa-arrow-right ms-2"></i>
                                                                 </Link>
@@ -201,7 +205,7 @@ function Dashboard() {
                                                     </tr>
                                                 ))}
 
-                                                {courses?.length < 1 && <p className="mt-4 p-4">No courses found</p>}
+                                                {enrolledCourses?.length < 1 && <p className="mt-4 p-4">No courses found</p>}
                                             </tbody>
                                         </table>
                                     </div>
