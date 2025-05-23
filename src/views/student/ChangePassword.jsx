@@ -31,6 +31,7 @@ function ChangePassword() {
                 icon: "error",
                 title: "Password does not match",
             });
+            return;
         }
 
         const formdata = new FormData();

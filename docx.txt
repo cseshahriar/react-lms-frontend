@@ -22,3 +22,9 @@ yarn add  prettier --dev
 
 # Todo:
 -- cart clear after payment
+
+Embed Unlisted Videos in Your LMS
+---------------------------------
+Upload videos as Unlisted on YouTube.
+Embed them in your LMS (Moodle, Teachable, Thinkific, etc.).
+Only enrolled students will see the links.
