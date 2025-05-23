@@ -18,9 +18,15 @@ function CourseDetail() {
 
   const [course, setCourse] = useState([]);
 
+  // play lecture modal
+  const [currentLecture, setCurrentLecture] = useState(null);
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
-  const handleShow = () => { setShow(true); }
+  const handleShow = (lecture) => {
+    setShow(true);
+    setCurrentLecture(lecture);
+  }
+
 
   const [noteShow, setNoteShow] = useState(false);
   const handleNoteClose = () => setNoteShow(false);
@@ -205,13 +211,15 @@ function CourseDetail() {
                                               <div className="d-flex justify-content-between align-items-center" key={index}>
                                                 <div className="position-relative d-flex align-items-center">
 
-                                                  <a
-                                                    target="_blank"
-                                                    href={lecture.file}
+
+                                                  {/** video */}
+                                                  <button
+                                                    onClick={() => handleShow(lecture)}
                                                     className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static"
                                                   >
                                                     <i className="fas fa-play me-0" />
-                                                  </a>
+                                                  </button>
+
 
                                                  <span className="d-inline-block text-wrap ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">
                                                   {lecture.title}
@@ -314,6 +322,7 @@ function CourseDetail() {
                                 </div>
                               </div>
                             </div>
+
                             <div
                               className="tab-pane fade"
                               id="course-pills-3"
@@ -378,6 +387,7 @@ function CourseDetail() {
                                 </div>
                               </div>
                             </div>
+
                             <div
                               className="tab-pane fade"
                               id="course-pills-4"
@@ -426,6 +436,7 @@ function CourseDetail() {
                                 </div>
                               </div>
                             </div>
+
                           </div>
                         </div>
                       </div>
@@ -439,17 +450,23 @@ function CourseDetail() {
       </section>
 
 
-
       {/* Lecture Modal */}
-      <Modal show={null} size='lg' onHide={null}>
+      <Modal show={show} size='xl' onHide={handleClose} className='className="video-container"'>
         <Modal.Header closeButton>
-          <Modal.Title>Lesson: Lesson Title</Modal.Title>
+          <Modal.Title>Lesson: {currentLecture?.title}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <ReactPlayer url={`url-here`} controls playing width={"100%"} height={"100%"} />
+          <ReactPlayer
+            url={currentLecture?.file}
+            volume="0"
+            controls
+            playing
+            width={"100%"}
+            height={"500px"}
+          />
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={null}>Close</Button>
+          <Button variant="secondary" onClick={handleClose}>Close</Button>
         </Modal.Footer>
       </Modal>
 
