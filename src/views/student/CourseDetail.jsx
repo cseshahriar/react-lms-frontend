@@ -157,6 +157,26 @@ function CourseDetail() {
     }
   }
 
+  const handleSubmitDeleteNote = async(noteId) => {
+    try {
+      await useAxios.delete(`student/course-note-detail/${UserData()?.user_id}/${params.enrollment_id}/${noteId}/`)
+        .then((response) => {
+          fetchData();
+            Toast().fire({
+                title: response.data?.message || "Note deleted successfully",
+                icon: "success",
+            });
+        })
+        handleNoteClose();
+    } catch (error) {
+      console.log(error);
+      Toast().fire({
+          title: error.data?.message || "Something went wrong. Please try again",
+          icon: "error",
+      });
+    }
+  }
+
   return (
     <>
       <BaseHeader />
@@ -425,7 +445,7 @@ function CourseDetail() {
                                               <i className="bi bi-pencil-square me-2" /> Edit
                                             </a>
 
-                                            <a href="#" className="btn btn-danger mb-0">
+                                            <a onClick={() => handleSubmitDeleteNote(note.id)} className="btn btn-danger mb-0">
                                               <i className="bi bi-trash me-2" /> Delete
                                             </a>
                                           </div>
