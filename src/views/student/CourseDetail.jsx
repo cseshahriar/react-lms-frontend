@@ -38,9 +38,12 @@ function CourseDetail() {
   const [selectedNote,  setSelectedNote] = useState(null);
   const [noteShow, setNoteShow] = useState(false);
   const handleNoteClose = () => setNoteShow(false);
-  const handleNoteShow = () => {
+
+  const handleNoteShow = (note) => {
     setNoteShow(true);
+    setSelectedNote(note);
   }
+  console.log('selectedNote', selectedNote);
 
   const [ConversationShow, setConversationShow] = useState(false);
   const handleConversationClose = () => setConversationShow(false);
@@ -120,7 +123,36 @@ function CourseDetail() {
       console.log(error);
       Toast().fire({
           title: error.data?.message || "Something went wrong. Please try again",
-          icon: "success",
+          icon: "error",
+      });
+    }
+  }
+
+
+  const handleSubmitEditNote = async(e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append("note_id", selectedNote.id);
+    formData.append("user_id", UserData()?.user_id);
+    formData.append("enrollment_id", params.enrollment_id);
+    formData.append("note", createNote.note);
+    formData.append("title", createNote.title);
+
+    try {
+      await useAxios.patch(`student/course-note-detail/${UserData()?.user_id}/${params.enrollment_id}/${selectedNote.id}/`, formData)
+        .then((response) => {
+          fetchData();
+            Toast().fire({
+                title: response.data?.message || "Note updated successfully",
+                icon: "success",
+            });
+        })
+        handleNoteClose();
+    } catch (error) {
+      console.log(error);
+      Toast().fire({
+          title: error.data?.message || "Something went wrong. Please try again",
+          icon: "error",
       });
     }
   }
@@ -386,7 +418,10 @@ function CourseDetail() {
                                           <p> {note.note}</p>
                                           {/* Buttons */}
                                           <div className="hstack gap-3 flex-wrap">
-                                            <a onClick={handleNoteShow} className="btn btn-success mb-0">
+                                            <a
+                                              onClick={() => handleNoteShow(note)}
+                                              className="btn btn-success mb-0"
+                                            >
                                               <i className="bi bi-pencil-square me-2" /> Edit
                                             </a>
 
@@ -555,17 +590,17 @@ function CourseDetail() {
       {/* Note Edit Modal */}
       <Modal show={noteShow} size='lg' onHide={handleNoteClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Note: Note Title</Modal.Title>
+          <Modal.Title>{selectedNote?.title}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <form>
+          <form onSubmit={handleSubmitEditNote}>
             <div className="mb-3">
               <label htmlFor="exampleInputEmail1" className="form-label">Note Title</label>
-              <input defaultValue={null} name='title' type="text" className="form-control" />
+              <input defaultValue={selectedNote?.title} name='title' type="text" className="form-control" onChange={handleChangeNote} />
             </div>
             <div className="mb-3">
               <label htmlFor="exampleInputPassword1" className="form-label">Note Content</label>
-              <textarea onChange={null} defaultValue={null} name='note' className='form-control' cols="30" rows="10"></textarea>
+              <textarea defaultValue={selectedNote?.note} name='note' className='form-control' cols="30" rows="10" onChange={handleChangeNote}></textarea>
             </div>
             <button type="button" className="btn btn-secondary me-2" onClick={null}><i className='fas fa-arrow-left'></i> Close</button>
             <button type="submit" className="btn btn-primary">Save Note <i className='fas fa-check-circle'></i></button>
