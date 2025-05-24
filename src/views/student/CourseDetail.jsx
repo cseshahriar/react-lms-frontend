@@ -22,19 +22,25 @@ function CourseDetail() {
   // play lecture modal
   const [completionPercentage, setCompletionPercentage] = useState(1);
   const [markAsCompletedStatus, setMarkAsCompletedStatus] = useState([]);
-  const [createNote, setCreateNote] = useState({"title": "", "note": ""});
+
 
   const [currentLecture, setCurrentLecture] = useState(null);
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
+
   const handleShow = (lecture) => {
     setShow(true);
     setCurrentLecture(lecture);
   }
 
+
+  const [createNote, setCreateNote] = useState({"title": "", "note": ""});
+  const [selectedNote,  setSelectedNote] = useState(null);
   const [noteShow, setNoteShow] = useState(false);
   const handleNoteClose = () => setNoteShow(false);
-  const handleNoteShow = () => { setNoteShow(true); }
+  const handleNoteShow = () => {
+    setNoteShow(true);
+  }
 
   const [ConversationShow, setConversationShow] = useState(false);
   const handleConversationClose = () => setConversationShow(false);
@@ -109,7 +115,7 @@ function CourseDetail() {
                 icon: "success",
             });
         })
-        handleNoteClose(true);
+        handleNoteClose();
     } catch (error) {
       console.log(error);
       Toast().fire({
@@ -373,29 +379,25 @@ function CourseDetail() {
                                 <div className="card-body p-0 pt-3">
                                   {/* Note item start */}
                                   <div className="row g-4 p-3">
-                                    <div className="col-sm-11 col-xl-11 shadow p-3 m-3 rounded">
-                                      <h5> What is Digital Marketing What is Digital Marketing</h5>
-                                      <p>
-                                        Arranging rapturous did believe him all had supported.
-                                        Supposing so be resolving breakfast am or perfectly.
-                                        It drew a hill from me. Valley by oh twenty direct me
-                                        so. Departure defective arranging rapturous did
-                                        believe him all had supported. Family months lasted
-                                        simple set nature vulgar him. Picture for attempt joy
-                                        excited ten carried manners talking how. Family months
-                                        lasted simple set nature vulgar him. Picture for
-                                        attempt joy excited ten carried manners talking how.
-                                      </p>
-                                      {/* Buttons */}
-                                      <div className="hstack gap-3 flex-wrap">
-                                        <a onClick={handleNoteShow} className="btn btn-success mb-0">
-                                          <i className="bi bi-pencil-square me-2" /> Edit
-                                        </a>
-                                        <a href="#" className="btn btn-danger mb-0">
-                                          <i className="bi bi-trash me-2" /> Delete
-                                        </a>
-                                      </div>
-                                    </div>
+                                    {
+                                      course?.note?.map((note, index) => (
+                                        <div className="col-sm-11 col-xl-11 shadow p-3 m-3 rounded" key={index}>
+                                          <h5>{note.title}</h5>
+                                          <p> {note.note}</p>
+                                          {/* Buttons */}
+                                          <div className="hstack gap-3 flex-wrap">
+                                            <a onClick={handleNoteShow} className="btn btn-success mb-0">
+                                              <i className="bi bi-pencil-square me-2" /> Edit
+                                            </a>
+
+                                            <a href="#" className="btn btn-danger mb-0">
+                                              <i className="bi bi-trash me-2" /> Delete
+                                            </a>
+                                          </div>
+                                        </div>
+                                      ))
+                                    }
+
                                   </div>
                                   <hr />
                                 </div>
