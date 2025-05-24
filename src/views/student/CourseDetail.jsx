@@ -11,6 +11,7 @@ import Header from './Partials/Header'
 
 import useAxios from "../../utils/useAxios";
 import UserData from "../plugin/UserData";
+import Toast from '../plugin/Toast';
 
 function CourseDetail() {
   const params = useParams();
@@ -21,6 +22,7 @@ function CourseDetail() {
   // play lecture modal
   const [completionPercentage, setCompletionPercentage] = useState(1);
   const [markAsCompletedStatus, setMarkAsCompletedStatus] = useState([]);
+  const [createNote, setCreateNote] = useState({"title": "", "note": ""});
 
   const [currentLecture, setCurrentLecture] = useState(null);
   const [show, setShow] = useState(false);
@@ -80,6 +82,41 @@ function CourseDetail() {
         [key]: "Updated"
       })
     })
+  }
+
+  const handleChangeNote = (event) => {
+    setCreateNote({
+      ...createNote,
+      [event.target.name]: event.target.value
+    })
+  }
+
+
+  const handleSubmitCreateNote = async(e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append("user_id", UserData()?.user_id);
+    formData.append("enrollment_id", params.enrollment_id);
+    formData.append("note", createNote.note);
+    formData.append("title", createNote.title);
+
+    try {
+      await useAxios.post(`student/course-note/${UserData()?.user_id}/${params.enrollment_id}/`, formData)
+        .then((response) => {
+          fetchData();
+            Toast().fire({
+                title: response.data?.message || "Note created successfully",
+                icon: "success",
+            });
+        })
+        handleNoteClose(true);
+    } catch (error) {
+      console.log(error);
+      Toast().fire({
+          title: error.data?.message || "Something went wrong. Please try again",
+          icon: "success",
+      });
+    }
   }
 
   return (
@@ -296,29 +333,34 @@ function CourseDetail() {
                                     <button type="button" className="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#exampleModal" >
                                       Add Note <i className='fas fa-pen'></i>
                                     </button>
+
                                     <div className="modal fade" id="exampleModal" tabIndex={-1} aria-labelledby="exampleModalLabel" aria-hidden="true">
                                       <div className="modal-dialog modal-dialog-centered">
                                         <div className="modal-content">
+
                                           <div className="modal-header">
                                             <h5 className="modal-title" id="exampleModalLabel">
                                               Add New Note <i className='fas fa-pen'></i>
                                             </h5>
                                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" />
                                           </div>
+
                                           <div className="modal-body">
-                                            <form>
+                                            <form onSubmit={handleSubmitCreateNote}>
                                               <div className="mb-3">
                                                 <label htmlFor="exampleInputEmail1" className="form-label">
                                                   Note Title
                                                 </label>
-                                                <input type="text" className="form-control" />
+                                                <input type="text" className="form-control" id='title' name='title' onChange={handleChangeNote} />
                                               </div>
+
                                               <div className="mb-3">
                                                 <label htmlFor="exampleInputPassword1" className="form-label">
                                                   Note Content
                                                 </label>
-                                                <textarea className='form-control' name="" id="" cols="30" rows="10"></textarea>
+                                                <textarea className='form-control' name="note" id="note" cols="30" rows="10" onChange={handleChangeNote} ></textarea>
                                               </div>
+
                                               <button type="button" className="btn btn-secondary me-2" data-bs-dismiss="modal" ><i className='fas fa-arrow-left'></i> Close</button>
                                               <button type="submit" className="btn btn-primary">Save Note <i className='fas fa-check-circle'></i></button>
                                             </form>
