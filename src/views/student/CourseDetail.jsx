@@ -33,9 +33,14 @@ function CourseDetail() {
     setCurrentLecture(lecture);
   }
 
-
+  // note
   const [createNote, setCreateNote] = useState({"title": "", "note": ""});
   const [selectedNote,  setSelectedNote] = useState(null);
+  const [createMessage, setCreateMessage] = useState({
+    title: "",
+    message: ""
+  });
+
   const [noteShow, setNoteShow] = useState(false);
   const handleNoteClose = () => setNoteShow(false);
 
@@ -43,7 +48,6 @@ function CourseDetail() {
     setNoteShow(true);
     setSelectedNote(note);
   }
-  console.log('selectedNote', selectedNote);
 
   const [ConversationShow, setConversationShow] = useState(false);
   const handleConversationClose = () => setConversationShow(false);
@@ -93,6 +97,7 @@ function CourseDetail() {
     })
   }
 
+  // notes
   const handleChangeNote = (event) => {
     setCreateNote({
       ...createNote,
@@ -100,6 +105,9 @@ function CourseDetail() {
     })
   }
 
+  const [addQuestionShow, setAddQuestionShow] = useState(false);
+  const handleQuestionClose = () => setAddQuestionShow(false);
+  const handleQuestionShow = () => setAddQuestionShow(true);
 
   const handleSubmitCreateNote = async(e) => {
     e.preventDefault();
@@ -176,6 +184,47 @@ function CourseDetail() {
       });
     }
   }
+
+
+  // discussion
+  const handleMessageChange = (event) => {
+    setCreateMessage({
+      ...createMessage,
+      [event.target.name]: event.target.value
+    })
+  }
+
+
+  const handleQuestionSubmit = async(e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append("course_id", course.course.id);
+    formData.append("user_id", UserData()?.user_id);
+    formData.append("title", createMessage.title);
+    formData.append("message", createMessage.message);
+
+    try {
+      await useAxios.post(`student/question-answer-list-create/${course.course?.id}/`, formData)
+      .then((response) => {
+        fetchData();
+        Toast().fire({
+           icon: "success",
+           title: "Question sent",
+        });
+        // Reset form state
+        setCreateMessage({
+          title: "",
+          message: ""
+        });
+      })
+    } catch (error) {
+      Toast().fire({
+        icon: "error",
+        title: error.data.message || "Something went wrong while create question",
+      });
+    }
+  }
+
 
   return (
     <>
@@ -482,7 +531,7 @@ function CourseDetail() {
                                     </div>
                                     <div className="col-sm-6 col-lg-3">
                                       <a
-                                        href="#"
+                                        onClick={handleQuestionShow}
                                         className="btn btn-primary mb-0 w-100"
                                         data-bs-toggle="modal"
                                         data-bs-target="#modalCreatePost"
@@ -628,7 +677,28 @@ function CourseDetail() {
         </Modal.Body>
       </Modal>
 
-      {/* Note Edit Modal */}
+      {/* discussion Modal */}
+      <Modal show={addQuestionShow} size='lg' onHide={handleQuestionClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Ask Question?</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <form onSubmit={handleQuestionSubmit}>
+            <div className="mb-3">
+              <label htmlFor="exampleInputEmail1" className="form-label">Title</label>
+              <input name='title' type="text" className="form-control" onChange={handleMessageChange} value={createMessage.title} />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="exampleInputPassword1" className="form-label">Message</label>
+              <textarea  name='message' className='form-control' cols="30" rows="10" onChange={handleMessageChange} value={createMessage.message}></textarea>
+            </div>
+            <button type="button" className="btn btn-secondary me-2" onClick={handleQuestionClose}><i className='fas fa-arrow-left'></i> Close</button>
+            <button type="submit" className="btn btn-primary">Save Note <i className='fas fa-check-circle'></i></button>
+          </form>
+        </Modal.Body>
+      </Modal>
+
+      {/* conversation Modal */}
       <Modal show={ConversationShow} size='lg' onHide={handleConversationClose}>
         <Modal.Header closeButton>
           <Modal.Title>Lesson: 123</Modal.Title>
