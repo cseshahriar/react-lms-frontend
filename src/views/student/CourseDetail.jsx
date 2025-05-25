@@ -13,6 +13,7 @@ import useAxios from "../../utils/useAxios";
 import UserData from "../plugin/UserData";
 import Toast from '../plugin/Toast';
 import moment from 'moment';
+import { BASE_URL } from '../../utils/constants';
 
 function CourseDetail() {
   const params = useParams();
@@ -461,6 +462,7 @@ function CourseDetail() {
                               {/* Accordion END */}
                             </div>
 
+                            {/** notes */}
                             <div
                               className="tab-pane fade"
                               id="course-pills-2"
@@ -758,7 +760,11 @@ function CourseDetail() {
                         <a href="#">
                           <img
                             className="avatar-img rounded-circle"
-                            src={m?.profile?.image}
+                            src={
+                              m.profile.image && m.profile.image.startsWith(BASE_URL)
+                                ? m.profile.image
+                                : `${BASE_URL}${m.profile.image}`
+                            }
                             style={{ width: "40px", height: "40px", borderRadius: "50%", objectFit: "cover" }} alt="womans image" />
                         </a>
                       </div>
