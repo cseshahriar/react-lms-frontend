@@ -61,10 +61,13 @@ function CourseDetail() {
     setConversationShow(true);
     setSelectedConversation(conversation);
   }
-  console.log('selectedConversation: ', selectedConversation);
 
+  // review
+  const [createReview, setCreateReview] = useState({rating: 1, review: ""});
+
+
+  // fetch course
   const [fetching, setFetching] = useState(true);
-
   const fetchData = () => {
       setFetching(true);
       try {
@@ -78,7 +81,6 @@ function CourseDetail() {
           setQuestions(response.data?.question_answer);
         });
       } catch (error) {
-        console.log(error);
         setFetching(false);
       }
   };
@@ -150,7 +152,7 @@ function CourseDetail() {
     } catch (error) {
       console.log(error);
       Toast().fire({
-          title: error.data?.message || "Something went wrong. Please try again",
+          title: error.response?.data?.message || "Something went wrong. Please try again",
           icon: "error",
       });
     }
@@ -179,7 +181,7 @@ function CourseDetail() {
     } catch (error) {
       console.log(error);
       Toast().fire({
-          title: error.data?.message || "Something went wrong. Please try again",
+          title: error.response?.data?.message || "Something went wrong. Please try again",
           icon: "error",
       });
     }
@@ -199,7 +201,7 @@ function CourseDetail() {
     } catch (error) {
       console.log(error);
       Toast().fire({
-          title: error.data?.message || "Something went wrong. Please try again",
+          title: error.response?.data?.message || "Something went wrong. Please try again",
           icon: "error",
       });
     }
@@ -240,7 +242,7 @@ function CourseDetail() {
     } catch (error) {
       Toast().fire({
         icon: "error",
-        title: error.data.message || "Something went wrong while create question",
+        title: error.response.data.message || "Something went wrong while create question",
       });
     }
   }
@@ -265,7 +267,7 @@ function CourseDetail() {
       } catch (error) {
         console.log('errors', error);
         Toast().fire({
-            title: error.data?.message || "Something went wrong. Please try again",
+            title: error.response.data?.message || "Something went wrong. Please try again",
             icon: "error",
         });
       }
@@ -283,6 +285,39 @@ function CourseDetail() {
     }
   }
 
+  // handle review change
+  const handleReviewChange = (event) => {
+    setCreateReview({
+      ...createReview,
+      [event.target.name]: event.target.value
+    }
+    )
+  }
+  const handleReviewSubmit = async(e) => {
+      e.preventDefault();
+      const formData = new FormData();
+      formData.append("course_id", course.course?.id);
+      formData.append("user_id", UserData()?.user_id);
+      formData.append("review", createReview.review);
+      formData.append("rating", createReview.rating);
+
+      try {
+        await useAxios.post(`student/rate-course/`, formData)
+          .then((response) => {
+            setSelectedConversation(response.data?.question);
+            Toast().fire({
+                title: response.data?.message || "Review created successfully",
+                icon: "success",
+            });
+          })
+      } catch (error) {
+        console.log('errors', error);
+        Toast().fire({
+          title: error.response?.data?.message || "Something went wrong. Please try again",
+          icon: "error",
+        });
+      }
+  }
 
   return (
     <>
@@ -661,13 +696,15 @@ function CourseDetail() {
                                   {/* Title */}
                                   <h4 className="mb-3 p-3">Leave a Review</h4>
                                   <div className="mt-2">
-                                    <form className="row g-3 p-3">
+                                    <form className="row g-3 p-3" onSubmit={handleReviewSubmit}>
 
                                       {/* Rating */}
                                       <div className="col-12 bg-light-input">
                                         <select
                                           id="inputState2"
                                           className="form-select js-choice"
+                                          onChange={handleReviewChange}
+                                          name='rating'
                                         >
                                           <option value={1}>★☆☆☆☆ (1/5)</option>
                                           <option value={2}>★★☆☆☆ (2/5)</option>
@@ -679,6 +716,8 @@ function CourseDetail() {
                                       {/* Message */}
                                       <div className="col-12 bg-light-input">
                                         <textarea
+                                          name='review'
+                                          onChange={handleReviewChange}
                                           className="form-control"
                                           id="exampleFormControlTextarea1"
                                           placeholder="Your review"
