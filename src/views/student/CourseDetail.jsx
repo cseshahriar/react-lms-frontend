@@ -64,6 +64,7 @@ function CourseDetail() {
 
   // review
   const [createReview, setCreateReview] = useState({rating: 1, review: ""});
+  const [studentReview, setStudentReview] = useState([]);
 
 
   // fetch course
@@ -79,6 +80,7 @@ function CourseDetail() {
           const percentageCompleted = (response.data?.completed_lesson?.length / response.data?.lectures?.length) * 100;
           setCompletionPercentage(percentageCompleted?.toFixed(2));
           setQuestions(response.data?.question_answer);
+          setStudentReview(response.data.review);
         });
       } catch (error) {
         setFetching(false);
@@ -303,6 +305,33 @@ function CourseDetail() {
 
       try {
         await useAxios.post(`student/rate-course/`, formData)
+          .then((response) => {
+            setSelectedConversation(response.data?.question);
+            Toast().fire({
+                title: response.data?.message || "Review created successfully",
+                icon: "success",
+            });
+          })
+      } catch (error) {
+        console.log('errors', error);
+        Toast().fire({
+          title: error.response?.data?.message || "Something went wrong. Please try again",
+          icon: "error",
+        });
+      }
+  }
+
+  console.log(studentReview);
+  const handleReviewUpdateSubmit = async(e) => {
+      e.preventDefault();
+      const formData = new FormData();
+      formData.append("course", course.course?.id);
+      formData.append("user", UserData()?.user_id);
+      formData.append("review", createReview.review || studentReview.review);
+      formData.append("rating", createReview.rating || studentReview.rating);
+
+      try {
+        await useAxios.patch(`student/review-detail/${UserData().user_id}/${studentReview.id}/`, formData)
           .then((response) => {
             setSelectedConversation(response.data?.question);
             Toast().fire({
@@ -696,7 +725,9 @@ function CourseDetail() {
                                   {/* Title */}
                                   <h4 className="mb-3 p-3">Leave a Review</h4>
                                   <div className="mt-2">
-                                    <form className="row g-3 p-3" onSubmit={handleReviewSubmit}>
+                                    <form className="row g-3 p-3"
+                                    onSubmit={ studentReview.review !== '' ? handleReviewUpdateSubmit: handleReviewSubmit}
+                                    >
 
                                       {/* Rating */}
                                       <div className="col-12 bg-light-input">
@@ -705,6 +736,7 @@ function CourseDetail() {
                                           className="form-select js-choice"
                                           onChange={handleReviewChange}
                                           name='rating'
+                                          defaultValue={studentReview.rating || 0}
                                         >
                                           <option value={1}>★☆☆☆☆ (1/5)</option>
                                           <option value={2}>★★☆☆☆ (2/5)</option>
@@ -722,13 +754,13 @@ function CourseDetail() {
                                           id="exampleFormControlTextarea1"
                                           placeholder="Your review"
                                           rows={3}
-                                          defaultValue={""}
+                                          defaultValue={studentReview.review || createReview.review}
                                         />
                                       </div>
                                       {/* Button */}
                                       <div className="col-12">
                                         <button type="submit" className="btn btn-primary mb-0">
-                                          Post Review
+                                          { studentReview.review !== '' ? "Update Review": 'Post Review'}
                                         </button>
                                       </div>
                                     </form>
