@@ -235,6 +235,32 @@ function CourseDetail() {
     }
   }
 
+  const sendNewMessage = async(e) => {
+      e.preventDefault();
+      const formData = new FormData();
+      formData.append("course_id", course.course?.id);
+      formData.append("user_id", UserData()?.user_id);
+      formData.append("message", createMessage.message);
+      formData.append("qa_id", selectedConversation?.qa_id);
+
+      try {
+        await useAxios.post(`student/question-answer-message-create/`, formData)
+          .then((response) => {
+            setSelectedConversation(response.data?.question);
+            Toast().fire({
+                title: response.data?.message || "Message created successfully",
+                icon: "success",
+            });
+          })
+      } catch (error) {
+        console.log('errors', error);
+        Toast().fire({
+            title: error.data?.message || "Something went wrong. Please try again",
+            icon: "error",
+        });
+      }
+  }
+
   return (
     <>
       <BaseHeader />
@@ -762,16 +788,23 @@ function CourseDetail() {
             </ul>
 
             {/** replay */}
-            <form className="w-100 d-flex">
-              <textarea name='message' className="one form-control pe-4 bg-light w-75" id="autoheighttextarea" rows="2" placeholder="What's your question?"></textarea>
-              <button className="btn btn-primary ms-2 mb-0 w-25" type="button">Post <i className='fas fa-paper-plane'></i></button>
+            <form className="w-100 d-flex" onSubmit={sendNewMessage}>
+              <textarea
+                required
+                onChange={handleMessageChange}
+                name='message'
+                className="one form-control pe-4 bg-light w-75"
+                id="autoheighttextarea" rows="2"
+                placeholder="What's your question?"
+              ></textarea>
+              <button type="submit" className="btn btn-primary ms-2 mb-0 w-25">Post <i className='fas fa-paper-plane'></i></button>
             </form>
 
-            <form className="w-100">
+            {/* <form className="w-100">
               <input name='title' type="text" className="form-control mb-2" placeholder='Question Title' />
               <textarea name='message' className="one form-control pe-4 mb-2 bg-light" id="autoheighttextarea" rows="5" placeholder="What's your question?"></textarea>
               <button className="btn btn-primary mb-0 w-25" type="button">Post <i className='fas fa-paper-plane'></i></button>
-            </form>
+            </form> */}
 
           </div>
         </Modal.Body>
