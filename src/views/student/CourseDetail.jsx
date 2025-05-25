@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import ReactPlayer from 'react-player'
 import Button from 'react-bootstrap/Button';
@@ -16,6 +16,7 @@ import moment from 'moment';
 import { BASE_URL } from '../../utils/constants';
 
 function CourseDetail() {
+  const lastElementRef = useRef();
   const params = useParams();
   const enrollmentId = params.enrollment_id;
 
@@ -83,6 +84,12 @@ function CourseDetail() {
   useEffect(() => {
       fetchData();
   }, [])
+
+  useEffect(() => {
+    if(lastElementRef.current) {
+      lastElementRef.current.scrollIntoView({behavior: "smooth"});
+    }
+  }, [selectedConversation])
 
   const handleMarkLessonAsCompleted = (variantItemId) => {
     const key = `lecture_${variantItemId}`;
@@ -791,6 +798,8 @@ function CourseDetail() {
                   </li>
                 ))
               }
+
+              <div ref={lastElementRef}></div>
             </ul>
 
             {/** replay */}
