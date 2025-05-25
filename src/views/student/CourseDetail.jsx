@@ -21,6 +21,7 @@ function CourseDetail() {
   const enrollmentId = params.enrollment_id;
 
   const [course, setCourse] = useState([]);
+  const [questions, setQuestions] = useState([]);
 
   // play lecture modal
   const [completionPercentage, setCompletionPercentage] = useState(1);
@@ -74,6 +75,7 @@ function CourseDetail() {
 
           const percentageCompleted = (response.data?.completed_lesson?.length / response.data?.lectures?.length) * 100;
           setCompletionPercentage(percentageCompleted?.toFixed(2));
+          setQuestions(response.data?.question_answer);
         });
       } catch (error) {
         console.log(error);
@@ -268,6 +270,19 @@ function CourseDetail() {
         });
       }
   }
+
+  const handleSearchQuestion = (event) => {
+    const query = event.target.value.toLowerCase();
+    if(query === "") {
+      fetchData();
+    } else {
+      const filtered = course?.question_answer.filter((question) => {
+        return question.title.toLowerCase().includes(query)
+      })
+      setQuestions(filtered);
+    }
+  }
+
 
   return (
     <>
@@ -563,11 +578,18 @@ function CourseDetail() {
                                 <div className="card-header border-bottom p-0 pb-3">
                                   {/* Title */}
                                   <h4 className="mb-3 p-3">Discussion</h4>
+
                                   <form className="row g-4 p-3">
                                     {/* Search */}
                                     <div className="col-sm-6 col-lg-9">
                                       <div className="position-relative">
-                                        <input className="form-control pe-5 bg-transparent" type="search" placeholder="Search" aria-label="Search" />
+                                        <input
+                                          className="form-control pe-5 bg-transparent"
+                                          type="search"
+                                          placeholder="Search"
+                                          aria-label="Search"
+                                          onChange={handleSearchQuestion}
+                                        />
                                         <button className="bg-transparent p-2 position-absolute top-50 end-0 translate-middle-y border-0 text-primary-hover text-reset" type="submit">
                                           <i className="fas fa-search fs-6 " />
                                         </button>
@@ -584,12 +606,13 @@ function CourseDetail() {
                                       </a>
                                     </div>
                                   </form>
+
                                 </div>
                                 {/* Card body */}
                                 <div className="card-body p-0 pt-3">
                                   <div className="vstack gap-3 p-3">
                                     {
-                                      course?.question_answer?.map((question, index) => (
+                                      questions?.map((question, index) => (
                                       <div className="shadow rounded-3 p-3" key={index}>
                                         <div className="d-sm-flex justify-content-sm-between mb-3">
                                           <div className="d-flex align-items-center">
