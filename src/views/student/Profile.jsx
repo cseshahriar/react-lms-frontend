@@ -33,7 +33,6 @@ function Profile() {
     fetchProfile()
   }, [])
 
-  console.log('profile', profile);
   const handleProfileChange = (event) => {
     setProfileData({
         ...profileData,
