@@ -10,7 +10,6 @@ function BaseHeader() {
     const [searchQuery, setSearchQuery] = useState("");
     const [user, setUser] = useState(null);
 
-
     const handleSearchSubmit = () => {
         navigate(`/search/?search=${searchQuery}`);
     };
@@ -20,7 +19,7 @@ function BaseHeader() {
         if (get_user) {
             setUser(get_user);
         }
-    }, [])
+    }, []);
 
     return (
         <div>
@@ -44,7 +43,7 @@ function BaseHeader() {
                         <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                             {user && (
                                 <>
-                                    { user?.teacher_id && (
+                                    {user?.teacher_id && (
                                         <li className="nav-item dropdown">
                                             <a
                                                 className="nav-link dropdown-toggle"
@@ -55,65 +54,20 @@ function BaseHeader() {
                                             >
                                                 <i className="fas fa-chalkboard-user"></i> Instructor
                                             </a>
-                                            <ul className="dropdown-menu">
-                                                <li>
-                                                    <Link
-                                                        className="dropdown-item"
-                                                        to={`/instructor/dashboard/`}
-                                                    >
-                                                        <i className="bi bi-grid-fill"></i> Dashboard
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link className="dropdown-item" to={`/instructor/courses/`}>
-                                                        <i className="fas fa-shopping-cart"></i> My Courses
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link
-                                                        className="dropdown-item"
-                                                        to={`/instructor/create-course/`}
-                                                    >
-                                                        <i className="fas fa-plus"></i> Create Course
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link className="dropdown-item" to={`/instructor/reviews/`}>
-                                                        <i className="fas fa-star"></i> Reviews{" "}
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link
-                                                        className="dropdown-item"
-                                                        to={`/instructor/question-answer/`}
-                                                    >
-                                                        <i className="fas fa-envelope"></i> Q/A{" "}
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link
-                                                        className="dropdown-item"
-                                                        to={`/instructor/students/`}
-                                                    >
-                                                        <i className="fas fa-users"></i> Students{" "}
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link className="dropdown-item" to={`/instructor/earning/`}>
-                                                        <i className="fas fa-dollar-sign"></i> Earning{" "}
-                                                    </Link>
-                                                </li>
-
-                                                <li>
-                                                    <Link className="dropdown-item" to={`/instructor/profile/`}>
-                                                        <i className="fas fa-gear"></i> Settings & Profile{" "}
-                                                    </Link>
-                                                </li>
-                                            </ul>
+                                         <ul className="dropdown-menu">
+                                            <li><Link className="dropdown-item" to={`/instructor/dashboard/`}><i className="bi bi-grid-fill"></i> Dashboard</Link></li>
+                                            <li><Link className="dropdown-item" to={`/instructor/courses/`}><i className="fas fa-shopping-cart"></i> My Courses</Link></li>
+                                            <li><Link className="dropdown-item" to={`/instructor/create-course/`}><i className="fas fa-plus"></i> Create Course</Link></li>
+                                            <li><Link className="dropdown-item" to={`/instructor/reviews/`}><i className="fas fa-star"></i> Reviews</Link></li>
+                                            <li><Link className="dropdown-item" to={`/instructor/question-answer/`}><i className="fas fa-envelope"></i> Q/A</Link></li>
+                                            <li><Link className="dropdown-item" to={`/instructor/students/`}><i className="fas fa-users"></i> Students</Link></li>
+                                            <li><Link className="dropdown-item" to={`/instructor/earning/`}><i className="fas fa-dollar-sign"></i> Earning</Link></li>
+                                            <li><Link className="dropdown-item" to={`/instructor/profile/`}><i className="fas fa-gear"></i> Settings & Profile</Link></li>
+                                        </ul>
                                         </li>
                                     )}
 
-                                    { !user?.teacher_id && (
+                                    {!user?.teacher_id && (
                                         <li className="nav-item dropdown">
                                             <a
                                                 className="nav-link dropdown-toggle"
@@ -125,37 +79,28 @@ function BaseHeader() {
                                                 <i className="fas fa-graduation-cap"></i> Student
                                             </a>
                                             <ul className="dropdown-menu">
-                                                <li>
+                                               <li>
                                                     <Link className="dropdown-item" to={`/student/dashboard/`}>
-                                                        {" "}
                                                         <i className="bi bi-grid-fill"></i> Dashboard
                                                     </Link>
                                                 </li>
                                                 <li>
-                                                    <Link className="dropdown-item" to={`/student/courses/`}>
-                                                        {" "}
-                                                        <i className="fas fa-shopping-cart"></i>My Courses
-                                                    </Link>
+                                                        <Link className="dropdown-item" to={`/student/courses/`}>
+                                                            <i className="fas fa-shopping-cart"></i> My Courses
+                                                        </Link>
                                                 </li>
-
                                                 <li>
                                                     <Link className="dropdown-item" to={`/student/wishlist/`}>
-                                                        {" "}
-                                                        <i className="fas fa-heart"></i> Wishlist{" "}
+                                                        <i className="fas fa-heart"></i> Wishlist
                                                     </Link>
                                                 </li>
                                                 <li>
-                                                    <Link
-                                                        className="dropdown-item"
-                                                        to={`/student/question-answer/`}
-                                                    >
-                                                        {" "}
-                                                        <i className="fas fa-envelope"></i> Q/A{" "}
+                                                    <Link className="dropdown-item" to={`/student/question-answer/`}>
+                                                        <i className="fas fa-envelope"></i> Q/A
                                                     </Link>
                                                 </li>
                                                 <li>
                                                     <Link className="dropdown-item" to={`/student/profile/`}>
-                                                        {" "}
                                                         <i className="fas fa-gear"></i> Profile & Settings
                                                     </Link>
                                                 </li>
@@ -165,18 +110,18 @@ function BaseHeader() {
                                 </>
                             )}
 
-                           <li className="nav-item">
+                            <li className="nav-item">
                                 <Link className="nav-link" to="/pages/about-us/">
                                     <i className="fas fa-address-card"></i> About Us
                                 </Link>
                             </li>
                             <li className="nav-item">
                                 <Link className="nav-link" to="/pages/contact-us/">
-                                    {" "}
                                     <i className="fas fa-phone"></i> Contact Us
                                 </Link>
                             </li>
                         </ul>
+
                         <div className="d-flex" role="search">
                             <input
                                 className="form-control me-2 w-100"
@@ -194,33 +139,23 @@ function BaseHeader() {
                             </button>
                         </div>
 
-                        {user &&  (
-                                <>
-                                    <Link to="/logout/" className="btn btn-primary ms-2" type="submit">
-                                        Logout <i className="fas fa-usign-out-alt"></i>
-                                    </Link>
-                                </>
-                            )
-                        }
-
-                        { !user && (
+                        {user ? (
+                            <Link to="/logout/" className="btn btn-primary ms-2" type="button">
+                                Logout <i className="fas fa-sign-out-alt"></i>
+                            </Link>
+                        ) : (
                             <>
-                                {/* Login and register button */}
-                                <Link to="/login/" className="btn btn-primary ms-2" type="submit">
+                                <Link to="/login/" className="btn btn-primary ms-2" type="button">
                                     Login <i className="fas fa-sign-in-alt"></i>
                                 </Link>
-                                <Link
-                                    to="/register/"
-                                    className="btn btn-primary ms-2"
-                                    type="submit"
-                                >
-                                    Register <i className="fas fa-user-plus"> </i>
+                                <Link to="/register/" className="btn btn-primary ms-2" type="button">
+                                    Register <i className="fas fa-user-plus"></i>
                                 </Link>
                             </>
                         )}
 
                         <Link className="btn btn-success ms-2" to="/cart">
-                            Cart ({cartCount}) <i className="fas fa-shopping-cart"> </i>
+                            Cart ({cartCount}) <i className="fas fa-shopping-cart"></i>
                         </Link>
                     </div>
                 </div>

@@ -10,12 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@ckeditor/ckeditor5-editor-classic": "^45.0.0",
-    "@ckeditor/ckeditor5-react": "^9.5.0",
     "@paypal/react-paypal-js": "^8.8.3",
+    "@tinymce/tinymce-react": "^6.1.0",
     "axios": "^1.9.0",
     "bootstrap": "^5.3.5",
     "chart.js": "^4.4.9",
+    "ckeditor4-react": "^5.2.1",
     "dayjs": "^1.11.13",
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
