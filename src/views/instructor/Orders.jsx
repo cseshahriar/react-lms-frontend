@@ -1,13 +1,24 @@
-import React from 'react'
-import Sidebar from './Partials/Sidebar'
-import Header from './Partials/Header'
+import { useState, useEffect } from "react";
+import moment from "moment";
 
-import BaseHeader from '../partials/BaseHeader'
-import BaseFooter from '../partials/BaseFooter'
-import { Link } from 'react-router-dom'
+import Sidebar from "./Partials/Sidebar";
+import Header from "./Partials/Header";
+import BaseHeader from "../partials/BaseHeader";
+import BaseFooter from "../partials/BaseFooter";
 
+import useAxios from "../../utils/useAxios";
+import Useta from "../plugin/UserData";
+import { teacherId } from "../../utils/constants";
+import UserData from "../plugin/UserData";
 
 function Orders() {
+    const [orders, setOrders] = useState([]);
+
+    useEffect(() => {
+        useAxios.get(`teacher/course-order-list/${UserData()?.teacher_id}/`).then((res) => {
+            setOrders(res.data);
+        });
+    }, []);
     return (
         <>
             <BaseHeader />
@@ -32,6 +43,7 @@ function Orders() {
                                     <table className="table mb-0 text-nowrap table-hover table-centered">
                                         <thead className="table-light">
                                             <tr>
+                                                <th>SL</th>
                                                 <th>Courses</th>
                                                 <th>Amount</th>
                                                 <th>Invoice</th>
@@ -39,31 +51,33 @@ function Orders() {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td>
-                                                    <h5 className="mb-0">
-                                                        <a href="#" className="text-inherit text-decoration-none text-dark">
-                                                            Building Scalable APIs with GraphQL
-                                                        </a>
-                                                    </h5>
-                                                </td>
-                                                <td>$89</td>
-                                                <td>#100233</td>
-                                                <td>June 9, 2020</td>
-                                            </tr>
+                                            {orders?.map((o, index) => (
+                                                <tr>
+                                                    <td>{index+1}</td>
+                                                    <td>
+                                                        <h5 className="mb-0">
+                                                            <a href="#" className="text-inherit text-decoration-none text-dark">
+                                                                {o.course.title}
+                                                            </a>
+                                                        </h5>
+                                                    </td>
+                                                    <td>${o.price}</td>
+                                                    <td>#{o.order.oid}</td>
+                                                    <td>{moment(o.date).format("DD MMM, YYYY")}</td>
+                                                </tr>
+                                            ))}
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </section>
 
             <BaseFooter />
         </>
-    )
+    );
 }
 
-export default Orders
+export default Orders;
