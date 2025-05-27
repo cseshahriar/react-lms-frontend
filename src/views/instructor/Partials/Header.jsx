@@ -1,6 +1,11 @@
-import React from 'react'
+import React, {useContext} from 'react'
+import { ProfileContext } from '../../plugin/Context';
+import { Link } from 'react-router-dom';
+
 
 function Header() {
+    const [profile, setProfile] = useContext(ProfileContext);
+
     return (
         <div className="row align-items-center">
             <div className="col-xl-12 col-lg-12 col-md-12 col-12">
@@ -8,11 +13,11 @@ function Header() {
                     <div className="d-flex align-items-end justify-content-between">
                         <div className="d-flex align-items-center">
                             <div className="me-2 position-relative d-flex justify-content-end align-items-end mt-n5">
-                                <img src="https://avatars.githubusercontent.com/u/28825857?s=400&u=63353e81c1215bcfbe19833ddb6486eb1ae09bbe&v=4" className="avatar-xl rounded-circle border border-4 border-white" alt="avatar" style={{ width: "70px", height: "70px", borderRadius: "50%", objectFit: "cover" }} />
+                                 <img src={profile?.image} className="avatar-xl rounded-circle border border-4 border-white" alt="avatar" style={{ width: "70px", height: "70px", borderRadius: "50%", objectFit: "cover" }} />
                             </div>
                             <div className="lh-1">
-                                <h2 className="mb-0"> Md. Shahriar Hosen</h2>
-                                <p className="mb-0 d-block">@cseshahrar</p>
+                                <h2 className="mb-0"> {profile?.full_name}</h2>
+                                <p className="mb-0 d-block">{profile?.about }</p>
                             </div>
                         </div>
                         <div>
