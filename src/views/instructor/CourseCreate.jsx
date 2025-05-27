@@ -71,34 +71,6 @@ function CourseCreate() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const json = {
-            title: courseData?.title,
-            description: courseData?.description,
-            image: courseData?.image,
-            file: courseData?.file,
-            level: courseData?.level,
-            language: courseData?.language,
-            price: courseData?.price,
-            category: courseData?.category,
-        };
-        try {
-            const response = await useAxios.post(`teacher/course-create/`, json);
-            console.log(response.data);
-            navigate(`/instructor/edit-course/${response?.data?.course_id}/`);
-            Swal.fire({
-                icon: "success",
-                title: "Course Created Successfully",
-            });
-        } catch (error) {
-            Swal.fire({
-                icon: "error",
-                title: error.data.message
-            });
-        }
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
 
         const formData = new FormData();
 
