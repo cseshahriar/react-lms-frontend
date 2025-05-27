@@ -1,19 +1,26 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { CartContext } from "../plugin/Context";
-import { useAuthStore } from "../../store/auth";
+import UserData from "../plugin/UserData";
 
 function BaseHeader() {
+    const navigate = useNavigate();
+
     const [cartCount, setCartCount] = useContext(CartContext);
     const [searchQuery, setSearchQuery] = useState("");
-    const navigate = useNavigate();
+    const [user, setUser] = useState(null);
+
 
     const handleSearchSubmit = () => {
         navigate(`/search/?search=${searchQuery}`);
     };
 
-    const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
-    const user = useAuthStore((state) => state.user);
+    useEffect(() => {
+        const get_user = UserData();
+        if (get_user) {
+            setUser(get_user);
+        }
+    }, [])
 
     return (
         <div>
@@ -35,8 +42,7 @@ function BaseHeader() {
                     </button>
                     <div className="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-                            {/** student and teacher routes */}
-                            {isLoggedIn() === true && (
+                            {user && (
                                 <>
                                     { user?.teacher_id && (
                                         <li className="nav-item dropdown">
@@ -188,13 +194,16 @@ function BaseHeader() {
                             </button>
                         </div>
 
-                        {isLoggedIn() === true ? (
-                            <>
-                                <Link to="/logout/" className="btn btn-primary ms-2" type="submit">
-                                    Logout <i className="fas fa-usign-out-alt"></i>
-                                </Link>
-                            </>
-                        ) : (
+                        {user &&  (
+                                <>
+                                    <Link to="/logout/" className="btn btn-primary ms-2" type="submit">
+                                        Logout <i className="fas fa-usign-out-alt"></i>
+                                    </Link>
+                                </>
+                            )
+                        }
+
+                        { !user && (
                             <>
                                 {/* Login and register button */}
                                 <Link to="/login/" className="btn btn-primary ms-2" type="submit">
