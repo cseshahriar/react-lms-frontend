@@ -1,4 +1,4 @@
-# pro-lms-frontend
+# react-lms-frontend
 
 # Dependency Install
 - yarn
